@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from matplotlib import colors
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 from matplotlib.patches import Rectangle
 import numpy as np
 from psychrochart import PsychroChart
@@ -33,7 +34,7 @@ def air_temperature(weather):
     norm = colors.Normalize(bins.min(), bins.max())
 
     for b, p in zip(bins, patches):
-        color = plt.cm.inferno(norm(b))
+        color = mpl.cm.inferno(norm(b))
         p.set_facecolor(color)
 
     # the cumulative distribution
@@ -55,7 +56,7 @@ def air_temperature(weather):
 
     # legend
     handles = [
-        Rectangle((0, 0), 1, 1, color=plt.cm.inferno(0.5), ec="k"),
+        Rectangle((0, 0), 1, 1, color=mpl.cm.inferno(0.5), ec="k"),
         Rectangle((0, 0), 1, 1, color='blue', alpha=0.6)
     ]
     labels = ["Dry bulb temperature", "Cumulative frequency"]
@@ -87,7 +88,7 @@ def relative_humidity(weather):
     norm = colors.Normalize(bins.min(), bins.max())
 
     for b, p in zip(bins, patches):
-        color = plt.cm.Blues(norm(b))
+        color = mpl.cm.Blues(norm(b))
         p.set_facecolor(color)
 
     # the cumulative distribution
@@ -108,7 +109,7 @@ def relative_humidity(weather):
 
     # legend
     handles = [
-        Rectangle((0, 0), 1, 1, color=plt.cm.Blues(0.5), ec="k"),
+        Rectangle((0, 0), 1, 1, color=mpl.cm.Blues(0.5), ec="k"),
         Rectangle((0, 0), 1, 1, color='blue', alpha=0.6)
     ]
     labels = ["Relative humidity", "Cumulative frequency"]
@@ -140,7 +141,7 @@ def horizontal_irradiance(weather):
     norm = colors.Normalize(bins.min(), bins.max())
 
     for b, p in zip(bins, patches):
-        color = plt.cm.viridis(norm(b))
+        color = mpl.cm.viridis(norm(b))
         p.set_facecolor(color)
 
     # the cumulative distribution
@@ -162,7 +163,7 @@ def horizontal_irradiance(weather):
 
     # legend
     handles = [
-        Rectangle((0, 0), 1, 1, color=plt.cm.viridis(0.5), ec="k"),
+        Rectangle((0, 0), 1, 1, color=mpl.cm.viridis(0.5), ec="k"),
         Rectangle((0, 0), 1, 1, color='blue', alpha=0.6)
     ]
     labels = ["Global horizontal irradiance", "Cumulative frequency"]
@@ -173,7 +174,7 @@ def horizontal_irradiance(weather):
 
 
 def heating_loads(cultural_e):
-    fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
+    _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
     # add x, y gridlines
     axs.grid(b=True, color='grey', linestyle='-.', linewidth=0.5, alpha=0.6)
@@ -185,9 +186,23 @@ def heating_loads(cultural_e):
 
     # TODO move this to data cleanup
     power = np.append(power[730:-730], power[-730:])
+
+    # sort by decreasing load
     y = -np.sort(-power)
 
     plt.plot(range(0, len(y)), y, label="Supply Air Total")
+
+    label = "{:.2f}".format(y[0])
+    plt.annotate(
+        label,  # this is the text
+        (0, y[0]),  # this is the point to label
+        textcoords="offset points",  # how to position the text
+        xytext=(0, 10),  # distance from text to points (x,y)
+        ha='center',  # horizontal alignment can be left, right or center
+        fontsize=LEGEND_FONTSIZE)
+
+    # title
+    plt.title("Cumulative Ideal Loads Heating Rate", fontsize=TITLE_FONTSIZE)
 
     # style axes
     plt.xticks(np.arange(0, 9500, 500))
@@ -224,7 +239,7 @@ def cooling_loads(cultural_e):
 
 
 def energy_balance():
-    fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
+    _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
     # add x, y gridlines
     axs.grid(b=True, color='grey', linestyle='-.', linewidth=0.5, alpha=0.6)
