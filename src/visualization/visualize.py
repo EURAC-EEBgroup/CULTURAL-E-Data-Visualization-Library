@@ -59,7 +59,7 @@ def air_temperature(weather):
         Rectangle((0, 0), 1, 1, color='blue', alpha=0.6)
     ]
     labels = ["Dry bulb temperature", "Cumulative frequency"]
-    plt.legend(handles, labels)
+    plt.legend(handles, labels, fontsize=LEGEND_FONTSIZE)
 
     fig.tight_layout()
     plt.show()
@@ -112,7 +112,7 @@ def relative_humidity(weather):
         Rectangle((0, 0), 1, 1, color='blue', alpha=0.6)
     ]
     labels = ["Relative humidity", "Cumulative frequency"]
-    plt.legend(handles, labels)
+    plt.legend(handles, labels, fontsize=LEGEND_FONTSIZE)
 
     fig.tight_layout()
     plt.show()
@@ -166,7 +166,7 @@ def horizontal_irradiance(weather):
         Rectangle((0, 0), 1, 1, color='blue', alpha=0.6)
     ]
     labels = ["Global horizontal irradiance", "Cumulative frequency"]
-    plt.legend(handles, labels)
+    plt.legend(handles, labels, fontsize=LEGEND_FONTSIZE)
 
     fig.tight_layout()
     plt.show()
@@ -251,7 +251,7 @@ def energy_balance():
 
     axs.set_ylabel('Energy Demand [kWh]')
     axs.set_title('Energy Balance')
-    axs.legend()
+    axs.legend(fontsize=LEGEND_FONTSIZE)
 
     plt.show()
 
@@ -361,8 +361,8 @@ def psychrochart():
     # Add a legend
     chart.plot_legend(markerscale=.7,
                       frameon=False,
-                      fontsize=10,
+                      fontsize=LEGEND_FONTSIZE,
                       labelspacing=1.2)
 
     ax = chart.plot()
-    ax.get_figure()
+    return ax
