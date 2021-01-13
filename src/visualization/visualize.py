@@ -251,7 +251,6 @@ def cooling_loads(cultural_e):
 
     plt.show()
 
-
 def energy_balance():
     _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
@@ -264,22 +263,60 @@ def energy_balance():
     ]
 
     a = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    # b = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    # c = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    # d = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12]
-    # e = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12]
-    # f = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12]
+    b = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    c = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    d = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12]
+    e = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12]
+    f = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12]
 
     width = 0.35
     axs.bar(labels, a, width, label='Transmission')
-    # axs.bar(labels, b, width, bottom=a, label='Heat')
-    # axs.bar(labels, c, width, bottom=a+b, label='Change internal energy')
-    # axs.bar(labels, d, width, label='Ventilation')
-    # axs.bar(labels, e, width, bottom=d, label='Cooling')
-    # axs.bar(labels, f, width, bottom=d+e, label='Internal gain')
+    axs.bar(labels, b, width, bottom=a, label='Heat')
+    axs.bar(labels, c, width, bottom=[x + y for x, y in zip(a, b)], label='Change internal energy')
+    axs.bar(labels, d, width, label='Ventilation')
+    axs.bar(labels, e, width, bottom=d, label='Cooling')
+    axs.bar(labels, f, width, bottom=[x + y for x, y in zip(d, e)], label='Internal gain')
 
-    axs.set_ylabel('Energy Demand [kWh]')
-    axs.set_title('Energy Balance')
+    axs.set_title('Energy Balance', fontsize=TITLE_FONTSIZE)
+
+    axs.set_ylabel('Energy Demand [kWh]', fontsize=LABELS_FONTSIZE)
+    axs.tick_params(labelsize=TICKS_FONTSIZE)
+
+    axs.legend(fontsize=LEGEND_FONTSIZE)
+
+    plt.show()
+
+def zone_energy_balance(zone_name):
+    _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
+
+    # add x, y gridlines
+    axs.grid(b=True, color='grey', linestyle='-.', linewidth=0.5, alpha=0.6)
+
+    labels = [
+        'January', 'February', 'March', 'April', 'May', 'June', 'July',
+        'August', 'September', 'October', 'November', 'December'
+    ]
+
+    a = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    b = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    c = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    d = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12]
+    e = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12]
+    f = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12]
+
+    width = 0.35
+    axs.bar(labels, a, width, label='Transmission')
+    axs.bar(labels, b, width, bottom=a, label='Heat')
+    axs.bar(labels, c, width, bottom=[x + y for x, y in zip(a, b)], label='Change internal energy')
+    axs.bar(labels, d, width, label='Ventilation')
+    axs.bar(labels, e, width, bottom=d, label='Cooling')
+    axs.bar(labels, f, width, bottom=[x + y for x, y in zip(d, e)], label='Internal gain')
+
+    axs.set_title('Energy Balance', fontsize=TITLE_FONTSIZE)
+
+    axs.set_ylabel('Energy Demand [kWh]', fontsize=LABELS_FONTSIZE)
+    axs.tick_params(labelsize=TICKS_FONTSIZE)
+    
     axs.legend(fontsize=LEGEND_FONTSIZE)
 
     plt.show()
