@@ -184,14 +184,12 @@ def heating_loads(cultural_e):
     # convert from Joule to Watt
     power = power / 3.6
 
-    # TODO move this to data cleanup
-    power = np.append(power[730:-730], power[-730:])
-
     # sort by decreasing load
     y = -np.sort(-power)
 
     plt.plot(range(0, len(y)), y, label="Supply Air Total")
 
+    # annotate max load
     label = "{:.2f}".format(y[0])
     plt.annotate(
         label,  # this is the text
@@ -225,15 +223,31 @@ def cooling_loads(cultural_e):
     # convert from Joule to Watt
     power = power / 3.6
 
-    # TODO move this to data cleanup
-    power = np.append(power[730:-730], power[-730:])
+    # sort by decreasing load
+    y = -np.sort(-power)
 
-    sns.lineplot(data=-np.sort(-power))
+    plt.plot(range(0, len(y)), y, label="Supply Air Total")
+
+    # annotate max load
+    label = "{:.2f}".format(y[0])
+    plt.annotate(
+        label,  # this is the text
+        (0, y[0]),  # this is the point to label
+        textcoords="offset points",  # how to position the text
+        xytext=(0, 10),  # distance from text to points (x,y)
+        ha='center',  # horizontal alignment can be left, right or center
+        fontsize=LEGEND_FONTSIZE)
+
+    # title
+    plt.title("Cumulative Ideal Loads Cooling Rate", fontsize=TITLE_FONTSIZE)
 
     # style axes
-    plt.xlabel("Time [hr]")
-    plt.ylabel("Power [kW]")
     plt.xticks(np.arange(0, 9500, 500))
+    axs.tick_params(labelsize=TICKS_FONTSIZE)
+    axs.set_xlabel("Time [hr]", fontsize=LABELS_FONTSIZE)
+    axs.set_ylabel("Power [kW]", fontsize=LABELS_FONTSIZE)
+
+    plt.legend(fontsize=LEGEND_FONTSIZE)
 
     plt.show()
 
