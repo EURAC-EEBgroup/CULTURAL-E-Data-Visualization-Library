@@ -7,9 +7,9 @@ from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
 
 
-def clean_energy_balance(input_filepath, output_filepath):
-    src = input_filepath + '/energy.bal'
-    dst = output_filepath + '/energy.csv'
+def clean_energy_zones(input_filepath, output_filepath):
+    src = input_filepath + '/Energy_zone.BAL'
+    dst = output_filepath + '/energy_zones.csv'
 
     bal = open(src, 'r')
     csv = open(dst, 'w')
@@ -32,9 +32,38 @@ def clean_energy_balance(input_filepath, output_filepath):
         o = re.sub(' +', ',', o)
         csv.write(o[1:])
 
+def clean_energy_balance(input_filepath, output_filepath):
+    src = input_filepath + '/SUMMARY.BAL'
+    dst = output_filepath + '/summary.csv'
+
+    bal = open(src, 'r')
+    csv = open(dst, 'w')
+
+    # skip first two rows containing the title
+    bal.readline()
+    bal.readline()
+
+    line = bal.readline()
+    # remove forbidden characters from title row
+    o = re.sub('[^ A-Za-z1-9_\n]*', '', line)
+    # format row as csv
+    o = re.sub(r'\|', '', o)
+    o = re.sub(' +', ',', o)
+
+    csv.write(o[1:])
+
+    # skip second row containing units
+    bal.readline()
+
+    # format remaining rows
+    for line in bal.readlines()[:-2]:
+        o = re.sub(r'\|', '', line)
+        o = re.sub(' +', ',', o)
+        csv.write(o[1:])
+
 
 def clean_cultural_e(input_filepath, output_filepath):
-    src = input_filepath + '/cultural-e.out'
+    src = input_filepath + '/CULTURAL-E_TSTEP.out'
     dst = output_filepath + '/cultural-e.csv'
 
     bal = open(src, 'r')
@@ -55,7 +84,7 @@ def clean_cultural_e(input_filepath, output_filepath):
 
 
 def clean_meteo(input_filepath, output_filepath):
-    src = input_filepath + '/meteo.epw'
+    src = input_filepath + '/Bolzano-metenorm-extreme.epw'
     dst = output_filepath + '/meteo.epw'
 
     copyfile(src, dst)
@@ -72,6 +101,7 @@ def main(input_filepath, output_filepath):
     logger.info('making final data set from raw data')
 
     clean_energy_balance(input_filepath, output_filepath)
+    clean_energy_zones(input_filepath, output_filepath)
     clean_cultural_e(input_filepath, output_filepath)
     clean_meteo(input_filepath, output_filepath)
     logger.info('final data set ready')

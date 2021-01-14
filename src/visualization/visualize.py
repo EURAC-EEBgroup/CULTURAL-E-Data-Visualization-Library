@@ -179,7 +179,7 @@ def heating_loads(cultural_e):
     # add x, y gridlines
     axs.grid(b=True, color='grey', linestyle='-.', linewidth=0.5, alpha=0.6)
 
-    power = cultural_e['QHEAT_1'].to_numpy()
+    power = cultural_e['SQHEAT_1'].to_numpy()
 
     # convert from Joule to Watt
     power = power / 3.6
@@ -219,7 +219,7 @@ def cooling_loads(cultural_e):
     # add x, y gridlines
     axs.grid(b=True, color='grey', linestyle='-.', linewidth=0.5, alpha=0.6)
 
-    power = cultural_e['QCOOL_1'].to_numpy()
+    power = cultural_e['SQCOOL_1'].to_numpy()
     # convert from Joule to Watt
     power = power / 3.6
 
@@ -251,42 +251,45 @@ def cooling_loads(cultural_e):
 
     plt.show()
 
-def energy_balance():
+
+def energy_balance(balance):
     _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
     # add x, y gridlines
     axs.grid(b=True, color='grey', linestyle='-.', linewidth=0.5, alpha=0.6)
 
-    labels = [
-        'January', 'February', 'March', 'April', 'May', 'June', 'July',
-        'August', 'September', 'October', 'November', 'December'
+    pos_fields = [
+        'QHEAT', 'QCOOL', 'QVENT', 'QTRANS', 'QGAININT', 'QWGAIN', 'QSOLGAIN',
+        'QSOLAIR'
     ]
 
-    a = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    b = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    c = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    d = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12]
-    e = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12]
-    f = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12]
+    x = balance['Zonenr'].to_numpy()
+    bottom = len(balance['Zonenr']) * [0]
+    for _idx, name in enumerate(pos_fields):
+        plt.bar(x, balance[name], bottom=bottom, label=name)
+        bottom = bottom + balance[name]
 
-    width = 0.35
-    axs.bar(labels, a, width, label='Transmission')
-    axs.bar(labels, b, width, bottom=a, label='Heat')
-    axs.bar(labels, c, width, bottom=[x + y for x, y in zip(a, b)], label='Change internal energy')
-    axs.bar(labels, d, width, label='Ventilation')
-    axs.bar(labels, e, width, bottom=d, label='Cooling')
-    axs.bar(labels, f, width, bottom=[x + y for x, y in zip(d, e)], label='Internal gain')
+    neg_fields = ['QINF', 'QCOUPL', 'QTRANS']
+    bottom = len(balance['Zonenr']) * [0]
+    for _idx, name in enumerate(neg_fields):
+        bottom = bottom + balance[name]
+        plt.bar(x, -balance[name], bottom=bottom, label=name)
 
-    axs.set_title('Energy Balance', fontsize=TITLE_FONTSIZE)
+    axs.set_title('Zone\'s Energy Balance', fontsize=TITLE_FONTSIZE)
 
     axs.set_ylabel('Energy Demand [kWh]', fontsize=LABELS_FONTSIZE)
+    axs.set_xlabel("Zone", fontsize=LABELS_FONTSIZE)
     axs.tick_params(labelsize=TICKS_FONTSIZE)
 
     axs.legend(fontsize=LEGEND_FONTSIZE)
 
     plt.show()
 
-def zone_energy_balance(zone_name):
+
+import random
+
+
+def zone_energy_balance(zone_name=''):
     _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
     # add x, y gridlines
@@ -298,25 +301,35 @@ def zone_energy_balance(zone_name):
     ]
 
     a = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    random.shuffle(a)
     b = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     c = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     d = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12]
+    random.shuffle(d)
     e = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12]
     f = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12]
 
     width = 0.35
     axs.bar(labels, a, width, label='Transmission')
     axs.bar(labels, b, width, bottom=a, label='Heat')
-    axs.bar(labels, c, width, bottom=[x + y for x, y in zip(a, b)], label='Change internal energy')
+    axs.bar(labels,
+            c,
+            width,
+            bottom=[x + y for x, y in zip(a, b)],
+            label='Change internal energy')
     axs.bar(labels, d, width, label='Ventilation')
     axs.bar(labels, e, width, bottom=d, label='Cooling')
-    axs.bar(labels, f, width, bottom=[x + y for x, y in zip(d, e)], label='Internal gain')
+    axs.bar(labels,
+            f,
+            width,
+            bottom=[x + y for x, y in zip(d, e)],
+            label='Internal gain')
 
-    axs.set_title('Energy Balance', fontsize=TITLE_FONTSIZE)
+    axs.set_title('Monthly Energy Balance', fontsize=TITLE_FONTSIZE)
 
     axs.set_ylabel('Energy Demand [kWh]', fontsize=LABELS_FONTSIZE)
     axs.tick_params(labelsize=TICKS_FONTSIZE)
-    
+
     axs.legend(fontsize=LEGEND_FONTSIZE)
 
     plt.show()
@@ -432,3 +445,86 @@ def psychrochart():
 
     ax = chart.plot()
     return ax
+
+
+def iaq_co2(data, zone_names):
+    _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
+
+    # add x, y gridlines
+    axs.grid(b=True, color='grey', linestyle='-.', linewidth=0.5, alpha=0.6)
+
+    colors = ['#1D2F6F', '#8390FA', '#6EAF46', '#FAC748']
+
+    for zone in zone_names:
+        # TODO correct categories
+        # TODO consider occupancy
+        co_2 = [data.query('{} < 480'.format(zone))[zone].size]
+        co_2 = co_2 + [
+            data.query('{} < 500'.format(zone))[zone].size - sum(co_2)
+        ]
+        co_2 = co_2 + [
+            data.query('{} < 700'.format(zone))[zone].size - sum(co_2)
+        ]
+        co_2 = co_2 + [
+            data.query('{} < 1000'.format(zone))[zone].size - sum(co_2)
+        ]
+
+        co_2 = [float(i) * 100 / sum(co_2) for i in co_2]
+
+        plt.barh(zone, co_2[0], left=[0], color=colors[0])
+        plt.barh(zone, co_2[1], left=co_2[0], color=colors[1])
+        plt.barh(zone, co_2[2], left=sum(co_2[0:2]), color=colors[2])
+        plt.barh(zone, co_2[3], left=sum(co_2[0:3]), color=colors[3])
+
+    axs.set_title('Indoor Air Quality - CO2', fontsize=TITLE_FONTSIZE)
+
+    axs.set_xlabel("Occupied Time [%]", fontsize=LABELS_FONTSIZE)
+    axs.tick_params(labelsize=TICKS_FONTSIZE)
+
+    labels = ['Category I', 'Category II', 'Category III', 'Category IV']
+    axs.legend(labels, fontsize=LEGEND_FONTSIZE)
+
+    plt.show()
+
+
+def relh(data, zone_names):
+    _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
+
+    # add x, y gridlines
+    axs.grid(b=True, color='grey', linestyle='-.', linewidth=0.5, alpha=0.6)
+
+    colors = ['#1D2F6F', '#8390FA', '#6EAF46', '#FAC748']
+
+    for zone in zone_names:
+        # TODO correct categories
+        # TODO consider occupancy
+        # TODO rename variables
+        co_2 = [data.query('{} < 20'.format(zone))[zone].size]
+        co_2 = co_2 + [
+            data.query('{z} > 30 and {z} < 50'.format(z=zone))[zone].size -
+            sum(co_2)
+        ]
+        co_2 = co_2 + [
+            data.query('{z} > 20 and {z} < 70'.format(z=zone))[zone].size -
+            sum(co_2)
+        ]
+        co_2 = co_2 + [
+            data.query('{z} > 70'.format(z=zone))[zone].size - sum(co_2)
+        ]
+
+        co_2 = [float(i) * 100 / sum(co_2) for i in co_2]
+
+        plt.barh(zone, co_2[0], left=[0], color=colors[0])
+        plt.barh(zone, co_2[1], left=co_2[0], color=colors[1])
+        plt.barh(zone, co_2[2], left=sum(co_2[0:2]), color=colors[2])
+        plt.barh(zone, co_2[3], left=sum(co_2[0:3]), color=colors[3])
+
+    axs.set_title('Indoor Relative Humidity', fontsize=TITLE_FONTSIZE)
+
+    axs.set_xlabel("Occupied Time [%]", fontsize=LABELS_FONTSIZE)
+    axs.tick_params(labelsize=TICKS_FONTSIZE)
+
+    labels = ['Too dry', 'Category I', 'Category II', 'Too humid']
+    axs.legend(labels, fontsize=LEGEND_FONTSIZE)
+
+    plt.show()
