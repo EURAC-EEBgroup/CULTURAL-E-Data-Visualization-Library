@@ -501,11 +501,11 @@ def relh(data, zone_names):
         # TODO rename variables
         co_2 = [data.query('{} < 20'.format(zone))[zone].size]
         co_2 = co_2 + [
-            data.query('{z} > 30 and {z} < 50'.format(z=zone))[zone].size -
+            data.query('({z} > 30) and ({z} < 50)'.format(z=zone))[zone].size -
             sum(co_2)
         ]
         co_2 = co_2 + [
-            data.query('{z} > 20 and {z} < 70'.format(z=zone))[zone].size -
+            data.query('({z} > 20) and ({z} < 70)'.format(z=zone))[zone].size -
             sum(co_2)
         ]
         co_2 = co_2 + [
