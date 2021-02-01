@@ -343,6 +343,11 @@ def monthly_consumption():
     return
 
 
+def adaptive_thermal_comfort():
+    # TODO
+    return
+
+
 def psychrochart():
     custom_style = {
         "figure": {
@@ -455,7 +460,9 @@ def psychrochart():
     return ax
 
 
-def iaq_co2(data, zone_names):
+def iaq_co2(data, living_rooms, bedrooms):
+    OUTDOOR_CO2 = 400
+
     _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
     # add x, y gridlines
@@ -463,26 +470,63 @@ def iaq_co2(data, zone_names):
 
     colors = ['#1D2F6F', '#8390FA', '#6EAF46', '#FAC748']
 
-    for zone in zone_names:
-        # TODO correct categories
+    for zone in living_rooms:
         # TODO consider occupancy
-        co_2 = [data.query('{} < 480'.format(zone))[zone].size]
-        co_2 = co_2 + [
-            data.query('{} < 500'.format(zone))[zone].size - sum(co_2)
+        co2 = 'CO2_CON_' + zone
+        occupancy = 'SCH_PER_' + zone
+
+        co_2 = [
+            data.query('({} <= {}) and ({} > 0)'.format(
+                co2, OUTDOOR_CO2 + 550, occupancy))[co2].size
         ]
         co_2 = co_2 + [
-            data.query('{} < 700'.format(zone))[zone].size - sum(co_2)
+            data.query('({} <= {}) and ({} > 0)'.format(
+                co2, OUTDOOR_CO2 + 800, occupancy))[co2].size - sum(co_2)
         ]
         co_2 = co_2 + [
-            data.query('{} < 1000'.format(zone))[zone].size - sum(co_2)
+            data.query('({} <= {}) and ({} > 0)'.format(
+                co2, OUTDOOR_CO2 + 1350, occupancy))[co2].size - sum(co_2)
+        ]
+        co_2 = co_2 + [
+            data.query('({} > {}) and ({} > 0)'.format(co2, OUTDOOR_CO2 + 1350,
+                                                       occupancy))[co2].size
         ]
 
         co_2 = [float(i) * 100 / sum(co_2) for i in co_2]
 
-        plt.barh(zone, co_2[0], left=[0], color=colors[0])
-        plt.barh(zone, co_2[1], left=co_2[0], color=colors[1])
-        plt.barh(zone, co_2[2], left=sum(co_2[0:2]), color=colors[2])
-        plt.barh(zone, co_2[3], left=sum(co_2[0:3]), color=colors[3])
+        plt.barh(co2, co_2[0], left=[0], color=colors[0])
+        plt.barh(co2, co_2[1], left=co_2[0], color=colors[1])
+        plt.barh(co2, co_2[2], left=sum(co_2[0:2]), color=colors[2])
+        plt.barh(co2, co_2[3], left=sum(co_2[0:3]), color=colors[3])
+
+    for zone in bedrooms:
+        # TODO consider occupancy
+        co2 = 'CO2_CON_' + zone
+        occupancy = 'SCH_PER_' + zone
+
+        co_2 = [
+            data.query('({} <= {}) and ({} > 0)'.format(
+                co2, OUTDOOR_CO2 + 380, occupancy))[co2].size
+        ]
+        co_2 = co_2 + [
+            data.query('({} <= {}) and ({} > 0)'.format(
+                co2, OUTDOOR_CO2 + 550, occupancy))[co2].size - sum(co_2)
+        ]
+        co_2 = co_2 + [
+            data.query('({} <= {}) and ({} > 0)'.format(
+                co2, OUTDOOR_CO2 + 950, occupancy))[co2].size - sum(co_2)
+        ]
+        co_2 = co_2 + [
+            data.query('({} > {}) and ({} > 0)'.format(co2, OUTDOOR_CO2 + 950,
+                                                       occupancy))[co2].size
+        ]
+
+        co_2 = [float(i) * 100 / sum(co_2) for i in co_2]
+
+        plt.barh(co2, co_2[0], left=[0], color=colors[0])
+        plt.barh(co2, co_2[1], left=co_2[0], color=colors[1])
+        plt.barh(co2, co_2[2], left=sum(co_2[0:2]), color=colors[2])
+        plt.barh(co2, co_2[3], left=sum(co_2[0:3]), color=colors[3])
 
     axs.set_title('Indoor Air Quality - CO2', fontsize=TITLE_FONTSIZE)
 
@@ -495,7 +539,7 @@ def iaq_co2(data, zone_names):
     plt.show()
 
 
-def relh(data, zone_names):
+def relh(data, zone_names, occupancy):
     _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
     # add x, y gridlines
@@ -503,36 +547,37 @@ def relh(data, zone_names):
 
     colors = ['#1D2F6F', '#8390FA', '#6EAF46', '#FAC748']
 
-    for zone in zone_names:
-        # TODO correct categories
-        # TODO consider occupancy
-        # TODO rename variables
-        co_2 = [data.query('{} < 20'.format(zone))[zone].size]
-        co_2 = co_2 + [
-            data.query('({z} > 30) and ({z} < 50)'.format(z=zone))[zone].size -
-            sum(co_2)
+    for (zone, occ) in zip(zone_names, occupancy):
+
+        relh = [
+            data.query('({z} > 30) and ({z} < 50) and ({o} > 0)'.format(
+                z=zone, o=occ))[zone].size
         ]
-        co_2 = co_2 + [
-            data.query('({z} > 20) and ({z} < 70)'.format(z=zone))[zone].size -
-            sum(co_2)
+        relh = relh + [
+            data.query('({z} > 20) and ({z} < 70) and ({o} > 0)'.format(
+                z=zone, o=occ))[zone].size - sum(relh)
         ]
-        co_2 = co_2 + [
-            data.query('{z} > 70'.format(z=zone))[zone].size - sum(co_2)
+        relh = relh + [
+            data.query('({z} > 70) and ({o} > 0)'.format(z=zone,
+                                                         o=occ))[zone].size
+        ]
+        relh = relh + [
+            data.query('({} < 20) and ({} > 0)'.format(zone, occ))[zone].size
         ]
 
-        co_2 = [float(i) * 100 / sum(co_2) for i in co_2]
+        relh = [float(i) * 100 / sum(relh) for i in relh]
 
-        plt.barh(zone, co_2[0], left=[0], color=colors[0])
-        plt.barh(zone, co_2[1], left=co_2[0], color=colors[1])
-        plt.barh(zone, co_2[2], left=sum(co_2[0:2]), color=colors[2])
-        plt.barh(zone, co_2[3], left=sum(co_2[0:3]), color=colors[3])
+        plt.barh(zone, relh[0], left=[0], color=colors[0])
+        plt.barh(zone, relh[1], left=relh[0], color=colors[1])
+        plt.barh(zone, relh[2], left=sum(relh[0:2]), color=colors[2])
+        plt.barh(zone, relh[3], left=sum(relh[0:3]), color=colors[3])
 
     axs.set_title('Indoor Relative Humidity', fontsize=TITLE_FONTSIZE)
 
     axs.set_xlabel("Occupied Time [%]", fontsize=LABELS_FONTSIZE)
     axs.tick_params(labelsize=TICKS_FONTSIZE)
 
-    labels = ['Too dry', 'Category I', 'Category II', 'Too humid']
+    labels = ['Category I', 'Category II', 'Too humid', 'Too dry']
     axs.legend(labels, fontsize=LEGEND_FONTSIZE)
 
     plt.show()
