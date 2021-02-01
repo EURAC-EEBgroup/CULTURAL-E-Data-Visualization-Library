@@ -253,6 +253,7 @@ def cooling_loads(cultural_e):
 
 
 def energy_balance(balance):
+    # TODO manage data with the wrong sign
     _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
     # add x, y gridlines
@@ -290,6 +291,8 @@ import random
 
 
 def zone_energy_balance(zone_name=''):
+    # TODO use real data
+
     _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
     # add x, y gridlines
@@ -333,6 +336,11 @@ def zone_energy_balance(zone_name=''):
     axs.legend(fontsize=LEGEND_FONTSIZE)
 
     plt.show()
+
+
+def monthly_consumption():
+    # TODO
+    return
 
 
 def psychrochart():
@@ -528,3 +536,8 @@ def relh(data, zone_names):
     axs.legend(labels, fontsize=LEGEND_FONTSIZE)
 
     plt.show()
+
+
+def discomfort_degree_hrs():
+    # TODO
+    return
