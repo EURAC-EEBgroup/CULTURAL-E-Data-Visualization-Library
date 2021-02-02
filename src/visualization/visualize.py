@@ -276,6 +276,12 @@ def energy_balance(balance):
         bottom = bottom + balance[name]
         plt.bar(x, -balance[name], bottom=bottom, label=name)
 
+    # remove spines
+    axs.spines['right'].set_visible(False)
+    axs.spines['left'].set_visible(False)
+    axs.spines['top'].set_visible(False)
+    axs.spines['bottom'].set_visible(False)
+
     axs.set_title('Zone\'s Energy Balance', fontsize=TITLE_FONTSIZE)
 
     axs.set_ylabel('Energy Demand [kWh]', fontsize=LABELS_FONTSIZE)
@@ -327,6 +333,12 @@ def zone_energy_balance(zone_name=''):
             width,
             bottom=[x + y for x, y in zip(d, e)],
             label='Internal gain')
+
+    # remove spines
+    axs.spines['right'].set_visible(False)
+    axs.spines['left'].set_visible(False)
+    axs.spines['top'].set_visible(False)
+    axs.spines['bottom'].set_visible(False)
 
     axs.set_title('Monthly Energy Balance', fontsize=TITLE_FONTSIZE)
 
@@ -528,6 +540,11 @@ def iaq_co2(data, living_rooms, bedrooms):
         plt.barh(co2, co_2[2], left=sum(co_2[0:2]), color=colors[2])
         plt.barh(co2, co_2[3], left=sum(co_2[0:3]), color=colors[3])
 
+    # remove spines
+    axs.spines['right'].set_visible(False)
+    axs.spines['top'].set_visible(False)
+    axs.spines['bottom'].set_visible(False)
+
     axs.set_title('Indoor Air Quality - CO2', fontsize=TITLE_FONTSIZE)
 
     axs.set_xlabel("Occupied Time [%]", fontsize=LABELS_FONTSIZE)
@@ -571,6 +588,12 @@ def relh(data, zone_names, occupancy):
         plt.barh(zone, relh[1], left=relh[0], color=colors[1])
         plt.barh(zone, relh[2], left=sum(relh[0:2]), color=colors[2])
         plt.barh(zone, relh[3], left=sum(relh[0:3]), color=colors[3])
+
+
+    # remove spines
+    axs.spines['right'].set_visible(False)
+    axs.spines['top'].set_visible(False)
+    axs.spines['bottom'].set_visible(False)
 
     axs.set_title('Indoor Relative Humidity', fontsize=TITLE_FONTSIZE)
 
