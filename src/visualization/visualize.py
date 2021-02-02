@@ -263,7 +263,6 @@ def energy_balance(balance):
         'QHEAT', 'QCOOL', 'QVENT', 'QTRANS', 'QGAININT', 'QWGAIN', 'QSOLGAIN',
         'QSOLAIR'
     ]
-
     x = balance['Zonenr'].to_numpy()
     bottom = len(balance['Zonenr']) * [0]
     for _idx, name in enumerate(pos_fields):
@@ -296,8 +295,8 @@ def energy_balance(balance):
 import random
 
 
-def zone_energy_balance(zone_name=''):
-    # TODO use real data
+def zone_energy_balance(energy, zone=''):
+    # TODO manage data with the wrong sign
 
     _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
@@ -309,30 +308,32 @@ def zone_energy_balance(zone_name=''):
         'August', 'September', 'October', 'November', 'December'
     ]
 
-    a = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    random.shuffle(a)
-    b = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    c = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    d = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12]
-    random.shuffle(d)
-    e = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12]
-    f = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12]
+    def month_from_hr(hour):
+        return min(int(hour) // 730, len(labels) - 1)
 
-    width = 0.35
-    axs.bar(labels, a, width, label='Transmission')
-    axs.bar(labels, b, width, bottom=a, label='Heat')
-    axs.bar(labels,
-            c,
-            width,
-            bottom=[x + y for x, y in zip(a, b)],
-            label='Change internal energy')
-    axs.bar(labels, d, width, label='Ventilation')
-    axs.bar(labels, e, width, bottom=d, label='Cooling')
-    axs.bar(labels,
-            f,
-            width,
-            bottom=[x + y for x, y in zip(d, e)],
-            label='Internal gain')
+    energy['MONTH'] = energy['TIME'].apply(month_from_hr)
+
+    data = energy.groupby('MONTH').sum()
+
+    pos_fields = [
+        zone + prop for prop in [
+            '_B4_QHEAT', '_B4_QCOOL', '_B4_QHEAT', '_B4_QCOOL', '_B4_QINF',
+            '_B4_QVENT'
+        ]
+    ]
+    x = labels
+    bottom = len(labels) * [0]
+    for _idx, name in enumerate(pos_fields):
+        plt.bar(x, data[name], bottom=bottom, label=name)
+        bottom = bottom + data[name]
+
+    neg_fields = [zone + prop for prop in ['_B4_QTRANS', '_B4_QINF']]
+    x = labels
+    bottom = len(labels) * [0]
+    for _idx, name in enumerate(neg_fields):
+        # TODO manage data with the wrong sign
+        bottom = bottom + -abs(data[name])
+        plt.bar(x, abs(data[name]), bottom=bottom, label=name)
 
     # remove spines
     axs.spines['right'].set_visible(False)
@@ -588,7 +589,6 @@ def relh(data, zone_names, occupancy):
         plt.barh(zone, relh[1], left=relh[0], color=colors[1])
         plt.barh(zone, relh[2], left=sum(relh[0:2]), color=colors[2])
         plt.barh(zone, relh[3], left=sum(relh[0:3]), color=colors[3])
-
 
     # remove spines
     axs.spines['right'].set_visible(False)
