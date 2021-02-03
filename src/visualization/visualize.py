@@ -7,7 +7,7 @@ import numpy as np
 from psychrochart import PsychroChart
 import seaborn as sns
 
-TITLE_FONTSIZE = 35
+TITLE_FONTSIZE = 32
 LABELS_FONTSIZE = 20
 TICKS_FONTSIZE = 15
 LEGEND_FONTSIZE = 15
@@ -214,7 +214,7 @@ def heating_loads(cultural_e):
 
 
 def cooling_loads(cultural_e):
-    fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
+    _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
     # add x, y gridlines
     axs.grid(b=True, color='grey', linestyle='-.', linewidth=0.5, alpha=0.6)
@@ -253,27 +253,30 @@ def cooling_loads(cultural_e):
 
 
 def energy_balance(balance):
-    # TODO manage data with the wrong sign
+    # TODO conversion to kWh?
     _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
     # add x, y gridlines
     axs.grid(b=True, color='grey', linestyle='-.', linewidth=0.5, alpha=0.6)
 
-    pos_fields = [
-        'QHEAT', 'QCOOL', 'QVENT', 'QTRANS', 'QGAININT', 'QWGAIN', 'QSOLGAIN',
-        'QSOLAIR'
+    fields = [
+        'QHEAT', 'QCOOL', 'QINF', 'QVENT', 'QCOUPL', 'QTRANS', 'QGAININT',
+        'QWGAIN', 'QSOLGAIN', 'QSOLAIR'
     ]
-    x = balance['Zonenr'].to_numpy()
+    x = balance['Zonenr'].to_list()
     bottom = len(balance['Zonenr']) * [0]
-    for _idx, name in enumerate(pos_fields):
-        plt.bar(x, balance[name], bottom=bottom, label=name)
-        bottom = bottom + balance[name]
+    for _idx, name in enumerate(fields):
+        plt.bar(x, [max(0, i) for i in balance[name]],
+                bottom=bottom,
+                label=name)
+        bottom = [max(0, i) + j for i, j in zip(balance[name], bottom)]
 
-    neg_fields = ['QINF', 'QCOUPL', 'QTRANS']
     bottom = len(balance['Zonenr']) * [0]
-    for _idx, name in enumerate(neg_fields):
-        bottom = bottom + balance[name]
-        plt.bar(x, -balance[name], bottom=bottom, label=name)
+    for _idx, name in enumerate(fields):
+        bottom = [min(0, i) + j for i, j in zip(balance[name], bottom)]
+        plt.bar(x, [-min(0, i) for i in balance[name]],
+                bottom=bottom,
+                label=name)
 
     # remove spines
     axs.spines['right'].set_visible(False)
@@ -296,7 +299,7 @@ import random
 
 
 def zone_energy_balance(energy, zone=''):
-    # TODO manage data with the wrong sign
+    # TODO conversion to kWh?
 
     _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
@@ -315,25 +318,23 @@ def zone_energy_balance(energy, zone=''):
 
     data = energy.groupby('MONTH').sum()
 
-    pos_fields = [
+    fields = [
         zone + prop for prop in [
-            '_B4_QHEAT', '_B4_QCOOL', '_B4_QHEAT', '_B4_QCOOL', '_B4_QINF',
-            '_B4_QVENT'
+            '_B4_QBAL', '_B4_DQAIRdT', '_B4_QHEAT', '_B4_QCOOL',
+            '_B4_QINF', '_B4_QVENT', 'B4_QCOUP', '_B4_QTRANS',
+            '_B4_QGINT', '_B4_QWGAIN', '_B4_QSOL', '_B4_QSOLAIR'
         ]
     ]
     x = labels
     bottom = len(labels) * [0]
-    for _idx, name in enumerate(pos_fields):
-        plt.bar(x, data[name], bottom=bottom, label=name)
-        bottom = bottom + data[name]
+    for _idx, name in enumerate(fields):
+        plt.bar(x, [max(0, i) for i in data[name]], bottom=bottom, label=name)
+        bottom = [max(0, i) + j for i, j in zip(data[name], bottom)]
 
-    neg_fields = [zone + prop for prop in ['_B4_QTRANS', '_B4_QINF']]
-    x = labels
     bottom = len(labels) * [0]
-    for _idx, name in enumerate(neg_fields):
-        # TODO manage data with the wrong sign
-        bottom = bottom + -abs(data[name])
-        plt.bar(x, abs(data[name]), bottom=bottom, label=name)
+    for _idx, name in enumerate(fields):
+        bottom = [min(0, i) + j for i, j in zip(data[name], bottom)]
+        plt.bar(x, [-min(0, i) for i in data[name]], bottom=bottom, label=name)
 
     # remove spines
     axs.spines['right'].set_visible(False)
@@ -341,7 +342,8 @@ def zone_energy_balance(energy, zone=''):
     axs.spines['top'].set_visible(False)
     axs.spines['bottom'].set_visible(False)
 
-    axs.set_title('Monthly Energy Balance', fontsize=TITLE_FONTSIZE)
+    axs.set_title('Monthly Energy Balance Zone: {}'.format(zone),
+                  fontsize=TITLE_FONTSIZE)
 
     axs.set_ylabel('Energy Demand [kWh]', fontsize=LABELS_FONTSIZE)
     axs.tick_params(labelsize=TICKS_FONTSIZE)
@@ -351,9 +353,51 @@ def zone_energy_balance(energy, zone=''):
     plt.show()
 
 
-def monthly_consumption():
-    # TODO
-    return
+def monthly_consumption(energy):
+    # TODO conversion to kWh?
+
+    _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
+
+    # add x, y gridlines
+    axs.grid(b=True, color='grey', linestyle='-.', linewidth=0.5, alpha=0.6)
+
+    labels = [
+        'January', 'February', 'March', 'April', 'May', 'June', 'July',
+        'August', 'September', 'October', 'November', 'December'
+    ]
+
+    def month_from_hr(hour):
+        return min(int(hour) // 730, len(labels) - 1)
+
+    energy['MONTH'] = energy['TIME'].apply(month_from_hr)
+
+    data = energy.groupby('MONTH').sum()
+
+    fields = [
+        'WEL_PDC_HEAT', 'WEL_PDC_COOL', 'WEL_VMC', 'IG_APL_TOT', 'IG_LGT_TOT'
+    ]
+
+    x = labels
+    bottom = len(labels) * [0]
+    for _idx, name in enumerate(fields):
+        plt.bar(x, data[name], bottom=bottom, label=name)
+        bottom = bottom + data[name]
+
+    # remove spines
+    axs.spines['right'].set_visible(False)
+    axs.spines['left'].set_visible(False)
+    axs.spines['top'].set_visible(False)
+    axs.spines['bottom'].set_visible(False)
+
+    axs.set_title('Monthly Energy Balance Zone: {}'.format(zone),
+                  fontsize=TITLE_FONTSIZE)
+
+    axs.set_ylabel('Energy Demand [kWh]', fontsize=LABELS_FONTSIZE)
+    axs.tick_params(labelsize=TICKS_FONTSIZE)
+
+    axs.legend(fontsize=LEGEND_FONTSIZE)
+
+    plt.show()
 
 
 def adaptive_thermal_comfort():
