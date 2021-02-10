@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import click
-import logging
-from shutil import copyfile
-import re
-from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
+import logging
+from itertools import chain
+import pandas as pd
+from pathlib import Path
+import re
+from shutil import copyfile
 
 
 def clean_energy_zones(input_filepath, output_filepath):
@@ -31,6 +33,26 @@ def clean_energy_zones(input_filepath, output_filepath):
         o = re.sub(r'\|', '', line)
         o = re.sub(' +', ',', o)
         csv.write(o[1:])
+
+
+def fix_year(input_filepath, output_filepath):
+    src = output_filepath + '/energy_zones.csv'
+    dst = output_filepath + '/energy_zones.csv'
+
+    df = pd.read_csv(src, index_col=False)
+
+    df.drop(range(0, 745), inplace=True)
+    df = df.reindex(chain(range(8760, 9505), range(745, 8760)))
+    df.reset_index(inplace=True)
+
+    del df['index']
+    del df['TIME']
+    df['TIME'] = df.index
+
+    df = df.reindex(columns=['TIME'] + [i for i in df.columns if i != 'TIME'])
+
+    df.to_csv(dst, index=False)
+
 
 def clean_energy_balance(input_filepath, output_filepath):
     src = input_filepath + '/SUMMARY.BAL'
@@ -102,6 +124,8 @@ def main(input_filepath, output_filepath):
 
     clean_energy_balance(input_filepath, output_filepath)
     clean_energy_zones(input_filepath, output_filepath)
+    # fix months of the year
+    fix_year(input_filepath, output_filepath)
     clean_cultural_e(input_filepath, output_filepath)
     clean_meteo(input_filepath, output_filepath)
     logger.info('final data set ready')

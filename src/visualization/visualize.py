@@ -11,6 +11,10 @@ TITLE_FONTSIZE = 32
 LABELS_FONTSIZE = 20
 TICKS_FONTSIZE = 15
 LEGEND_FONTSIZE = 15
+# conversion factors
+JOULE_TO_WATT_FACTOR = 3.6
+JOULE_TO_KW_FACTOR = JOULE_TO_WATT_FACTOR * 1000
+HOURS_IN_A_MONTH = 730
 
 
 def air_temperature(weather):
@@ -182,7 +186,7 @@ def heating_loads(cultural_e):
     power = cultural_e['SQHEAT_1'].to_numpy()
 
     # convert from Joule to Watt
-    power = power / 3.6
+    power = power / JOULE_TO_WATT_FACTOR
 
     # sort by decreasing load
     y = -np.sort(-power)
@@ -221,7 +225,7 @@ def cooling_loads(cultural_e):
 
     power = cultural_e['SQCOOL_1'].to_numpy()
     # convert from Joule to Watt
-    power = power / 3.6
+    power = power / JOULE_TO_WATT_FACTOR
 
     # sort by decreasing load
     y = -np.sort(-power)
@@ -266,15 +270,21 @@ def energy_balance(balance):
     x = balance['Zonenr'].to_list()
     bottom = len(balance['Zonenr']) * [0]
     for _idx, name in enumerate(fields):
-        plt.bar(x, [max(0, i) for i in balance[name]],
+        plt.bar(x, [max(0, i) / JOULE_TO_KW_FACTOR for i in balance[name]],
                 bottom=bottom,
                 label=name)
-        bottom = [max(0, i) + j for i, j in zip(balance[name], bottom)]
+        bottom = [
+            max(0, i) / JOULE_TO_KW_FACTOR + j
+            for i, j in zip(balance[name], bottom)
+        ]
 
     bottom = len(balance['Zonenr']) * [0]
     for _idx, name in enumerate(fields):
-        bottom = [min(0, i) + j for i, j in zip(balance[name], bottom)]
-        plt.bar(x, [-min(0, i) for i in balance[name]],
+        bottom = [
+            min(0, i) / JOULE_TO_KW_FACTOR + j
+            for i, j in zip(balance[name], bottom)
+        ]
+        plt.bar(x, [-min(0, i) / JOULE_TO_KW_FACTOR for i in balance[name]],
                 bottom=bottom,
                 label=name)
 
@@ -312,7 +322,7 @@ def zone_energy_balance(energy, zone=''):
     ]
 
     def month_from_hr(hour):
-        return min(int(hour) // 730, len(labels) - 1)
+        return min(int(hour) // HOURS_IN_A_MONTH, len(labels) - 1)
 
     energy['MONTH'] = energy['TIME'].apply(month_from_hr)
 
@@ -320,21 +330,31 @@ def zone_energy_balance(energy, zone=''):
 
     fields = [
         zone + prop for prop in [
-            '_B4_QBAL', '_B4_DQAIRdT', '_B4_QHEAT', '_B4_QCOOL',
-            '_B4_QINF', '_B4_QVENT', 'B4_QCOUP', '_B4_QTRANS',
-            '_B4_QGINT', '_B4_QWGAIN', '_B4_QSOL', '_B4_QSOLAIR'
+            '_B4_QBAL', '_B4_DQAIRdT', '_B4_QHEAT', '_B4_QCOOL', '_B4_QINF',
+            '_B4_QVENT', 'B4_QCOUP', '_B4_QTRANS', '_B4_QGINT', '_B4_QWGAIN',
+            '_B4_QSOL', '_B4_QSOLAIR'
         ]
     ]
     x = labels
     bottom = len(labels) * [0]
     for _idx, name in enumerate(fields):
-        plt.bar(x, [max(0, i) for i in data[name]], bottom=bottom, label=name)
-        bottom = [max(0, i) + j for i, j in zip(data[name], bottom)]
+        plt.bar(x, [max(0, i) / JOULE_TO_KW_FACTOR for i in data[name]],
+                bottom=bottom,
+                label=name)
+        bottom = [
+            max(0, i) / JOULE_TO_KW_FACTOR + j
+            for i, j in zip(data[name], bottom)
+        ]
 
     bottom = len(labels) * [0]
     for _idx, name in enumerate(fields):
-        bottom = [min(0, i) + j for i, j in zip(data[name], bottom)]
-        plt.bar(x, [-min(0, i) for i in data[name]], bottom=bottom, label=name)
+        bottom = [
+            min(0, i) / JOULE_TO_KW_FACTOR + j
+            for i, j in zip(data[name], bottom)
+        ]
+        plt.bar(x, [-min(0, i) / JOULE_TO_KW_FACTOR for i in data[name]],
+                bottom=bottom,
+                label=name)
 
     # remove spines
     axs.spines['right'].set_visible(False)
@@ -367,7 +387,7 @@ def monthly_consumption(energy):
     ]
 
     def month_from_hr(hour):
-        return min(int(hour) // 730, len(labels) - 1)
+        return min(int(hour) // HOURS_IN_A_MONTH, len(labels) - 1)
 
     energy['MONTH'] = energy['TIME'].apply(month_from_hr)
 
