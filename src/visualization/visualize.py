@@ -7,6 +7,7 @@ import numpy as np
 from psychrochart import PsychroChart
 import seaborn as sns
 
+# styling consants
 TITLE_FONTSIZE = 32
 LABELS_FONTSIZE = 20
 TICKS_FONTSIZE = 15
