@@ -464,8 +464,7 @@ def psychrochart(data, zone):
 
     # Add labelled points
     points = dict()
-    for index, row in data[['TAIR_' + zone,
-                                  'RELHUM_' + zone]].iterrows():
+    for index, row in data[['TAIR_' + zone, 'RELHUM_' + zone]].iterrows():
         key = 'interior_{}'.format(index)
         points.update({
             key: {
@@ -485,7 +484,7 @@ def psychrochart(data, zone):
                       frameon=False,
                       fontsize=LEGEND_FONTSIZE,
                       labelspacing=1.2)
-    
+
     return ax
 
 
@@ -622,6 +621,52 @@ def relh(data, zone_names, occupancy):
     plt.show()
 
 
-def discomfort_degree_hrs():
-    # TODO
-    return
+def airt_heatmap(data, zone):
+    _fig, _axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
+
+    def hr_of_day(hour):
+        return int(hour) % 24
+
+    def day(hour):
+        return int(hour) // 24
+
+    df = data[['TIME', 'TAIR_' + zone]]
+    df['DAY'] = df['TIME'].apply(day)
+    df['HOUR'] = df['TIME'].apply(hr_of_day)
+    df = df.pivot(index='HOUR', columns='DAY', values='TAIR_' + zone)
+    sns.heatmap(df, cmap='plasma')
+    plt.show()
+
+
+def shd_heatmap(data):
+    _fig, _axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
+
+    def hr_of_day(hour):
+        return int(hour) % 24
+
+    def day(hour):
+        return int(hour) // 24
+
+    df = data[['TIME', 'SHD_W1']]
+    df['DAY'] = df['TIME'].apply(day)
+    df['HOUR'] = df['TIME'].apply(hr_of_day)
+    df = df.pivot(index='HOUR', columns='DAY', values='SHD_W1')
+    sns.heatmap(df, cmap='plasma')
+    plt.show()
+
+
+def win_heatmap(data):
+    _fig, _axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
+
+    def hr_of_day(hour):
+        return int(hour) % 24
+
+    def day(hour):
+        return int(hour) // 24
+
+    df = data[['TIME', 'WIN_LR']]
+    df['DAY'] = df['TIME'].apply(day)
+    df['HOUR'] = df['TIME'].apply(hr_of_day)
+    df = df.pivot(index='HOUR', columns='DAY', values='WIN_LR')
+    sns.heatmap(df, cmap='plasma')
+    plt.show()
