@@ -35,7 +35,7 @@ def clean_energy_zones(input_filepath, output_filepath):
         csv.write(o[1:])
 
 
-def fix_year(input_filepath, output_filepath):
+def fix_year_in_energy_zones(input_filepath, output_filepath):
     src = output_filepath + '/energy_zones.csv'
     dst = output_filepath + '/energy_zones.csv'
 
@@ -105,6 +105,24 @@ def clean_cultural_e(input_filepath, output_filepath):
         csv.write(o[1:-2] + '\n')
 
 
+def fix_year_in_cultural_e(input_filepath, output_filepath):
+    src = output_filepath + '/cultural-e.csv'
+    dst = output_filepath + '/cultural-e.csv'
+
+    df = pd.read_csv(src, index_col=False)
+
+    df = df.reindex(chain(range(8015, 8760), range(0, 8015)))
+    df.reset_index(inplace=True)
+
+    del df['index']
+    del df['TIME']
+    df['TIME'] = df.index
+
+    df = df.reindex(columns=['TIME'] + [i for i in df.columns if i != 'TIME'])
+
+    df.to_csv(dst, index=False)
+
+
 def clean_meteo(input_filepath, output_filepath):
     src = input_filepath + '/Bolzano-metenorm-extreme.epw'
     dst = output_filepath + '/meteo.epw'
@@ -125,8 +143,10 @@ def main(input_filepath, output_filepath):
     clean_energy_balance(input_filepath, output_filepath)
     clean_energy_zones(input_filepath, output_filepath)
     # fix months of the year
-    fix_year(input_filepath, output_filepath)
+    fix_year_in_energy_zones(input_filepath, output_filepath)
     clean_cultural_e(input_filepath, output_filepath)
+    # fix months of the year
+    fix_year_in_cultural_e(input_filepath, output_filepath)
     clean_meteo(input_filepath, output_filepath)
     logger.info('final data set ready')
 

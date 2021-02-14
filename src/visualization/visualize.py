@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 from matplotlib.patches import Rectangle
 import numpy as np
-from psychrochart import PsychroChart
+from psychrochart import PsychroChart, load_config
 import seaborn as sns
 
 # styling consants
@@ -258,7 +258,6 @@ def cooling_loads(cultural_e):
 
 
 def energy_balance(balance):
-    # TODO conversion to kWh?
     _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
     # add x, y gridlines
@@ -310,8 +309,6 @@ import random
 
 
 def zone_energy_balance(energy, zone=''):
-    # TODO conversion to kWh?
-
     _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
     # add x, y gridlines
@@ -401,8 +398,13 @@ def monthly_consumption(energy):
     x = labels
     bottom = len(labels) * [0]
     for _idx, name in enumerate(fields):
-        plt.bar(x, data[name], bottom=bottom, label=name)
-        bottom = bottom + data[name]
+        plt.bar(x, [max(0, i) / JOULE_TO_KW_FACTOR for i in data[name]],
+                bottom=bottom,
+                label=name)
+        bottom = [
+            max(0, i) / JOULE_TO_KW_FACTOR + j
+            for i, j in zip(data[name], bottom)
+        ]
 
     # remove spines
     axs.spines['right'].set_visible(False)
@@ -410,8 +412,7 @@ def monthly_consumption(energy):
     axs.spines['top'].set_visible(False)
     axs.spines['bottom'].set_visible(False)
 
-    axs.set_title('Monthly Energy Balance Zone: {}'.format(zone),
-                  fontsize=TITLE_FONTSIZE)
+    axs.set_title('Monthly Energy Consumption', fontsize=TITLE_FONTSIZE)
 
     axs.set_ylabel('Energy Demand [kWh]', fontsize=LABELS_FONTSIZE)
     axs.tick_params(labelsize=TICKS_FONTSIZE)
@@ -426,44 +427,8 @@ def adaptive_thermal_comfort():
     return
 
 
-def psychrochart():
-    custom_style = {
-        "figure": {
-            "figsize": [16, 9],
-            "base_fontsize": 12,
-            "title": "Psychrochart",
-            "x_label": None,
-            "y_label": None,
-            "partial_axis": False
-        },
-        "limits": {
-            "range_temp_c": [0, 45],
-            "range_humidity_g_kg": [0, 30],
-            "altitude_m": 900,
-            "step_temp": .5
-        },
-        "saturation": {
-            "color": [0, .3, 1.],
-            "linewidth": 2
-        },
-        "constant_rh": {
-            "color": [0.0, 0.498, 1.0, .7],
-            "linewidth": 2.5,
-            "linestyle": ":"
-        },
-        "chart_params": {
-            "with_constant_rh": True,
-            "constant_rh_curves": [25, 50, 75],
-            "constant_rh_labels": [25, 50, 75],
-            "range_vol_m3_kg": [0.9, 1.],
-            "constant_v_labels": [0.9, 0.94, 0.98],
-            "with_constant_h": False,
-            "with_constant_wet_temp": False,
-            "with_zones": False
-        }
-    }
-
-    chart = PsychroChart(custom_style)
+def psychrochart(data, zone):
+    chart = PsychroChart('ashrae')
 
     # Append zones:
     zones_conf = {
@@ -495,46 +460,32 @@ def psychrochart():
     chart.append_zones(zones_conf)
 
     # Plot the chart
-    chart.plot()
+    ax = chart.plot()
 
-    # Add labelled points and conexions between points
-    points = {
-        'exterior': {
-            'label': 'Exterior',
-            'style': {
-                'color': [0.855, 0.004, 0.278, 0.8],
-                'marker': 'X',
-                'markersize': 15
-            },
-            'xy': (31.06, 32.9)
-        },
-        'interior': {
-            'label': 'Interior',
-            'style': {
-                'color': [0.592, 0.745, 0.051, 0.9],
-                'marker': 'o',
-                'markersize': 15
-            },
-            'xy': (29.42, 52.34)
-        },
-        'interior2': {
-            'style': {
-                'color': [0.592, 0.745, 0.051, 0.9],
-                'marker': 'o',
-                'markersize': 15
-            },
-            'xy': (25.42, 52.34)
-        }
-    }
+    # Add labelled points
+    points = dict()
+    for index, row in data[['TAIR_' + zone,
+                                  'RELHUM_' + zone]].iterrows():
+        key = 'interior_{}'.format(index)
+        points.update({
+            key: {
+                'style': {
+                    'color': [0.592, 0.745, 0.051, 0.7],
+                    'marker': 'o',
+                    'markersize': 5
+                },
+                'xy': (row['TAIR_' + zone], row['RELHUM_' + zone])
+            }
+        })
 
     chart.plot_points_dbt_rh(points)
+
     # Add a legend
     chart.plot_legend(markerscale=.7,
                       frameon=False,
                       fontsize=LEGEND_FONTSIZE,
                       labelspacing=1.2)
-
-    ax = chart.plot()
+    
     return ax
 
 
