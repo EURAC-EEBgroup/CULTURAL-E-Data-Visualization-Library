@@ -1,10 +1,29 @@
-simviz
-==============================
+# Cultural-e Visualization Library - simviz
 
-A short description of the project.
+The present project makes use of a standard structure for data science projects, that aims at correctness and reproducibility. The results are multiple and comprise: an installable Python library, Jupiter notebooks and HTML reports, cleanup scripts for the standard input data, and an effective development environment.
 
-Project Organization
-------------
+For more information, please refer to the homepage of the project on which this work is based: [Cookiecutter Data Science](https://drivendata.github.io/cookiecutter-data-science/).
+
+## Requirements
+
+```python >=3.5``` and all the libraries listed in ```requirements.txt```.
+
+## Installation
+Install ```python``` on your machine and its package manager ```pip```, then you can proceded to the installation of the requirements in ```requirements.txt``` with:
+```
+pip install -r requirements.txt
+```
+Consider using a ```virtualenv``` before doing this (strongly suggested).
+
+Now you are ready to go. The ```data``` folder contains some example data that you can cleanup with:
+```
+make data
+```
+and then head to the notebooks folder and open the file ```1.0-report.ipynb``` in your [Jupiter Notebook](https://jupyter.org/) editor. Running this notebook will give a standardized set of graphs describing the main results of the simulation in the data folder.
+Feel free to modify the notebook to your convenience in order to taylor the analysis to your needs.
+
+## Project Organization
+
 
     ├── LICENSE
     ├── Makefile           <- Makefile with commands like `make data` or `make train`

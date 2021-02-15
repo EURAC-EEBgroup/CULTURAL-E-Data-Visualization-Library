@@ -19,6 +19,10 @@ HOURS_IN_A_MONTH = 730
 
 
 def air_temperature(weather):
+    '''
+    Prints an histogram of the temperatures in the area during the year, plus their cumulative
+    distribution.
+    '''
     fig, ax1 = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
     ax2 = ax1.twinx()
 
@@ -72,6 +76,10 @@ def air_temperature(weather):
 
 
 def relative_humidity(weather):
+    '''
+    Prints an histogram of the relative humidity in the area during the year, plus its cumulative
+    distribution.
+    '''
     fig, ax1 = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
     ax2 = ax1.twinx()
@@ -125,6 +133,9 @@ def relative_humidity(weather):
 
 
 def horizontal_irradiance(weather):
+    '''
+    Prints an histogram of the horizontal radiation in the area during the year.
+    '''
     fig, ax1 = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
     ax2 = ax1.twinx()
@@ -179,6 +190,9 @@ def horizontal_irradiance(weather):
 
 
 def heating_loads(cultural_e):
+    '''
+    Prints the cumulative ideal loads of the heating system.
+    '''
     _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
     # add x, y gridlines
@@ -219,6 +233,9 @@ def heating_loads(cultural_e):
 
 
 def cooling_loads(cultural_e):
+    '''
+    Prints the cumulative ideal loads of the cooling system.
+    '''
     _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
     # add x, y gridlines
@@ -258,16 +275,24 @@ def cooling_loads(cultural_e):
 
 
 def energy_balance(balance):
+    '''
+    Prints the energy balance of the whole simulation.
+    '''
     _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
     # add x, y gridlines
     axs.grid(b=True, color='grey', linestyle='-.', linewidth=0.5, alpha=0.6)
 
+    # fields accounting for the energy balance
     fields = [
         'QHEAT', 'QCOOL', 'QINF', 'QVENT', 'QCOUPL', 'QTRANS', 'QGAININT',
         'QWGAIN', 'QSOLGAIN', 'QSOLAIR'
     ]
+
+    # x axis contains the different zones simulated
     x = balance['Zonenr'].to_list()
+
+    # first plot the positive contributions
     bottom = len(balance['Zonenr']) * [0]
     for _idx, name in enumerate(fields):
         plt.bar(x, [max(0, i) / JOULE_TO_KW_FACTOR for i in balance[name]],
@@ -278,6 +303,7 @@ def energy_balance(balance):
             for i, j in zip(balance[name], bottom)
         ]
 
+    # now plot the negative contributions
     bottom = len(balance['Zonenr']) * [0]
     for _idx, name in enumerate(fields):
         bottom = [
@@ -294,12 +320,11 @@ def energy_balance(balance):
     axs.spines['top'].set_visible(False)
     axs.spines['bottom'].set_visible(False)
 
+    # style graph
     axs.set_title('Zone\'s Energy Balance', fontsize=TITLE_FONTSIZE)
-
     axs.set_ylabel('Energy Demand [kWh]', fontsize=LABELS_FONTSIZE)
     axs.set_xlabel("Zone", fontsize=LABELS_FONTSIZE)
     axs.tick_params(labelsize=TICKS_FONTSIZE)
-
     axs.legend(fontsize=LEGEND_FONTSIZE)
 
     plt.show()
@@ -309,6 +334,9 @@ import random
 
 
 def zone_energy_balance(energy, zone=''):
+    '''
+    Print the energy balance of a single zone simulated.
+    '''
     _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
     # add x, y gridlines
@@ -319,6 +347,7 @@ def zone_energy_balance(energy, zone=''):
         'August', 'September', 'October', 'November', 'December'
     ]
 
+    # map hours to their month
     def month_from_hr(hour):
         return min(int(hour) // HOURS_IN_A_MONTH, len(labels) - 1)
 
@@ -326,6 +355,7 @@ def zone_energy_balance(energy, zone=''):
 
     data = energy.groupby('MONTH').sum()
 
+    # fields accounting for the energy balance
     fields = [
         zone + prop for prop in [
             '_B4_QBAL', '_B4_DQAIRdT', '_B4_QHEAT', '_B4_QCOOL', '_B4_QINF',
@@ -333,7 +363,11 @@ def zone_energy_balance(energy, zone=''):
             '_B4_QSOL', '_B4_QSOLAIR'
         ]
     ]
+
+    # the months of the year
     x = labels
+
+    # first plot the positive contributions
     bottom = len(labels) * [0]
     for _idx, name in enumerate(fields):
         plt.bar(x, [max(0, i) / JOULE_TO_KW_FACTOR for i in data[name]],
@@ -344,6 +378,7 @@ def zone_energy_balance(energy, zone=''):
             for i, j in zip(data[name], bottom)
         ]
 
+    # now plot the negative contributions
     bottom = len(labels) * [0]
     for _idx, name in enumerate(fields):
         bottom = [
@@ -360,20 +395,20 @@ def zone_energy_balance(energy, zone=''):
     axs.spines['top'].set_visible(False)
     axs.spines['bottom'].set_visible(False)
 
+    # style the graph
     axs.set_title('Monthly Energy Balance Zone: {}'.format(zone),
                   fontsize=TITLE_FONTSIZE)
-
     axs.set_ylabel('Energy Demand [kWh]', fontsize=LABELS_FONTSIZE)
     axs.tick_params(labelsize=TICKS_FONTSIZE)
-
     axs.legend(fontsize=LEGEND_FONTSIZE)
 
     plt.show()
 
 
 def monthly_consumption(energy):
-    # TODO conversion to kWh?
-
+    '''
+    Prints the consumpion in various categories.
+    '''
     _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
     # add x, y gridlines
@@ -384,18 +419,24 @@ def monthly_consumption(energy):
         'August', 'September', 'October', 'November', 'December'
     ]
 
+    # map hours to their month
     def month_from_hr(hour):
         return min(int(hour) // HOURS_IN_A_MONTH, len(labels) - 1)
 
     energy['MONTH'] = energy['TIME'].apply(month_from_hr)
 
+    # aggregate monthly consumptions
     data = energy.groupby('MONTH').sum()
 
+    # fields accounting for the consumtions
     fields = [
         'WEL_PDC_HEAT', 'WEL_PDC_COOL', 'WEL_VMC', 'IG_APL_TOT', 'IG_LGT_TOT'
     ]
 
+    # months of the year
     x = labels
+
+    # al the contributions should be positive, we currently ignore negative values
     bottom = len(labels) * [0]
     for _idx, name in enumerate(fields):
         plt.bar(x, [max(0, i) / JOULE_TO_KW_FACTOR for i in data[name]],
@@ -412,11 +453,10 @@ def monthly_consumption(energy):
     axs.spines['top'].set_visible(False)
     axs.spines['bottom'].set_visible(False)
 
+    # style graph
     axs.set_title('Monthly Energy Consumption', fontsize=TITLE_FONTSIZE)
-
     axs.set_ylabel('Energy Demand [kWh]', fontsize=LABELS_FONTSIZE)
     axs.tick_params(labelsize=TICKS_FONTSIZE)
-
     axs.legend(fontsize=LEGEND_FONTSIZE)
 
     plt.show()
@@ -428,9 +468,12 @@ def adaptive_thermal_comfort():
 
 
 def psychrochart(data, zone):
+    '''
+    Prints the standard Ashrae psychrometric chart with data from a zone.
+    '''
     chart = PsychroChart('ashrae')
 
-    # Append zones:
+    # comfort zones
     zones_conf = {
         "zones": [{
             "zone_type": "dbt-rh",
@@ -459,10 +502,10 @@ def psychrochart(data, zone):
 
     chart.append_zones(zones_conf)
 
-    # Plot the chart
+    # plot the chart together with the comfort zones
     ax = chart.plot()
 
-    # Add labelled points
+    # add labelled points from the simulated zone
     points = dict()
     for index, row in data[['TAIR_' + zone, 'RELHUM_' + zone]].iterrows():
         key = 'interior_{}'.format(index)
@@ -489,6 +532,10 @@ def psychrochart(data, zone):
 
 
 def iaq_co2(data, living_rooms, bedrooms):
+    '''
+    Prints the indoor CO2 concentration belonging to four different classes of comfort.
+    '''
+    # average outdoor value for CO2
     OUTDOOR_CO2 = 400
 
     _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
@@ -496,10 +543,12 @@ def iaq_co2(data, living_rooms, bedrooms):
     # add x, y gridlines
     axs.grid(b=True, color='grey', linestyle='-.', linewidth=0.5, alpha=0.6)
 
+    # palette
     colors = ['#1D2F6F', '#8390FA', '#6EAF46', '#FAC748']
 
+    # zones used during day have different categories with respect to nightly zones
+    # start with day zones
     for zone in living_rooms:
-        # TODO consider occupancy
         co2 = 'CO2_CON_' + zone
         occupancy = 'SCH_PER_' + zone
 
@@ -527,8 +576,8 @@ def iaq_co2(data, living_rooms, bedrooms):
         plt.barh(co2, co_2[2], left=sum(co_2[0:2]), color=colors[2])
         plt.barh(co2, co_2[3], left=sum(co_2[0:3]), color=colors[3])
 
+    # follow with night zones
     for zone in bedrooms:
-        # TODO consider occupancy
         co2 = 'CO2_CON_' + zone
         occupancy = 'SCH_PER_' + zone
 
@@ -561,11 +610,10 @@ def iaq_co2(data, living_rooms, bedrooms):
     axs.spines['top'].set_visible(False)
     axs.spines['bottom'].set_visible(False)
 
+    # style
     axs.set_title('Indoor Air Quality - CO2', fontsize=TITLE_FONTSIZE)
-
     axs.set_xlabel("Occupied Time [%]", fontsize=LABELS_FONTSIZE)
     axs.tick_params(labelsize=TICKS_FONTSIZE)
-
     labels = ['Category I', 'Category II', 'Category III', 'Category IV']
     axs.legend(labels, fontsize=LEGEND_FONTSIZE)
 
@@ -573,6 +621,9 @@ def iaq_co2(data, living_rooms, bedrooms):
 
 
 def relh(data, zone_names, occupancy):
+    '''
+
+    '''
     _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
     # add x, y gridlines
@@ -580,8 +631,9 @@ def relh(data, zone_names, occupancy):
 
     colors = ['#1D2F6F', '#8390FA', '#6EAF46', '#FAC748']
 
+    # in the case of relative humidity the comfort zones are intersecting
+    # be aware that the order of the following lines is important
     for (zone, occ) in zip(zone_names, occupancy):
-
         relh = [
             data.query('({z} > 30) and ({z} < 50) and ({o} > 0)'.format(
                 z=zone, o=occ))[zone].size
@@ -610,11 +662,10 @@ def relh(data, zone_names, occupancy):
     axs.spines['top'].set_visible(False)
     axs.spines['bottom'].set_visible(False)
 
+    # style
     axs.set_title('Indoor Relative Humidity', fontsize=TITLE_FONTSIZE)
-
     axs.set_xlabel("Occupied Time [%]", fontsize=LABELS_FONTSIZE)
     axs.tick_params(labelsize=TICKS_FONTSIZE)
-
     labels = ['Category I', 'Category II', 'Too humid', 'Too dry']
     axs.legend(labels, fontsize=LEGEND_FONTSIZE)
 
@@ -622,6 +673,10 @@ def relh(data, zone_names, occupancy):
 
 
 def airt_heatmap(data, zone):
+    '''
+    Prints a heatmap with the value for temperature at every hour of the day, for every day
+    of the year.
+    '''
     _fig, _axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
     def hr_of_day(hour):
@@ -630,15 +685,22 @@ def airt_heatmap(data, zone):
     def day(hour):
         return int(hour) // 24
 
+    # shape data
     df = data[['TIME', 'TAIR_' + zone]]
     df['DAY'] = df['TIME'].apply(day)
     df['HOUR'] = df['TIME'].apply(hr_of_day)
     df = df.pivot(index='HOUR', columns='DAY', values='TAIR_' + zone)
+
     sns.heatmap(df, cmap='plasma')
+    
     plt.show()
 
 
 def shd_heatmap(data):
+    '''
+    Prints a heatmap with the value for the shading at every hour of the day, for every day
+    of the year.
+    '''
     _fig, _axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
     def hr_of_day(hour):
@@ -647,15 +709,21 @@ def shd_heatmap(data):
     def day(hour):
         return int(hour) // 24
 
+    # shape data
     df = data[['TIME', 'SHD_W1']]
     df['DAY'] = df['TIME'].apply(day)
     df['HOUR'] = df['TIME'].apply(hr_of_day)
     df = df.pivot(index='HOUR', columns='DAY', values='SHD_W1')
     sns.heatmap(df, cmap='plasma')
+
     plt.show()
 
 
 def win_heatmap(data):
+    '''
+    Prints a heatmap with the value for the windows opening at every hour of the day, for every day
+    of the year.
+    '''
     _fig, _axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
 
     def hr_of_day(hour):
@@ -664,9 +732,11 @@ def win_heatmap(data):
     def day(hour):
         return int(hour) // 24
 
+    # shape data
     df = data[['TIME', 'WIN_LR']]
     df['DAY'] = df['TIME'].apply(day)
     df['HOUR'] = df['TIME'].apply(hr_of_day)
     df = df.pivot(index='HOUR', columns='DAY', values='WIN_LR')
     sns.heatmap(df, cmap='plasma')
+
     plt.show()

@@ -10,6 +10,9 @@ from shutil import copyfile
 
 
 def clean_energy_zones(input_filepath, output_filepath):
+    '''
+    Converts the .BAL containing the output of the simulation for each zone to a proper .csv file.
+    '''
     src = input_filepath + '/Energy_zone.BAL'
     dst = output_filepath + '/energy_zones.csv'
 
@@ -36,6 +39,11 @@ def clean_energy_zones(input_filepath, output_filepath):
 
 
 def fix_year_in_energy_zones(input_filepath, output_filepath):
+    '''
+    The simulation has a warm-up time of one month and runs for 13 months, thus it is necessary 
+    to skip the data for the first month of the simulation and consider in its place the following
+    January.
+    '''
     src = output_filepath + '/energy_zones.csv'
     dst = output_filepath + '/energy_zones.csv'
 
@@ -55,6 +63,9 @@ def fix_year_in_energy_zones(input_filepath, output_filepath):
 
 
 def clean_energy_balance(input_filepath, output_filepath):
+    '''
+    Converts the .BAL containing the simulation summary to a proper .csv file.
+    '''
     src = input_filepath + '/SUMMARY.BAL'
     dst = output_filepath + '/summary.csv'
 
@@ -85,6 +96,10 @@ def clean_energy_balance(input_filepath, output_filepath):
 
 
 def clean_cultural_e(input_filepath, output_filepath):
+    '''
+    The .out file is a sort of csv that uses whitespaces as separators, we convert it to a
+    .csv in a more classical dialect.
+    '''
     src = input_filepath + '/CULTURAL-E_TSTEP.out'
     dst = output_filepath + '/cultural-e.csv'
 
@@ -106,6 +121,11 @@ def clean_cultural_e(input_filepath, output_filepath):
 
 
 def fix_year_in_cultural_e(input_filepath, output_filepath):
+    '''
+    The simulation has a warm-up time of one month and runs for 13 months, thus it is necessary 
+    to skip the data for the first month of the simulation and consider in its place the following
+    January.
+    '''
     src = output_filepath + '/cultural-e.csv'
     dst = output_filepath + '/cultural-e.csv'
 
@@ -124,6 +144,10 @@ def fix_year_in_cultural_e(input_filepath, output_filepath):
 
 
 def clean_meteo(input_filepath, output_filepath):
+    '''
+    The weather file is already in a proper format, we just rename and copy it to the processed
+    folder.
+    '''
     src = input_filepath + '/Bolzano-metenorm-extreme.epw'
     dst = output_filepath + '/meteo.epw'
 
@@ -140,12 +164,11 @@ def main(input_filepath, output_filepath):
     logger = logging.getLogger(__name__)
     logger.info('making final data set from raw data')
 
+    # check the docstrings of each function to better understand the cleanup phase
     clean_energy_balance(input_filepath, output_filepath)
     clean_energy_zones(input_filepath, output_filepath)
-    # fix months of the year
     fix_year_in_energy_zones(input_filepath, output_filepath)
     clean_cultural_e(input_filepath, output_filepath)
-    # fix months of the year
     fix_year_in_cultural_e(input_filepath, output_filepath)
     clean_meteo(input_filepath, output_filepath)
     logger.info('final data set ready')
