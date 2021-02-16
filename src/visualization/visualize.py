@@ -467,7 +467,7 @@ def adaptive_thermal_comfort():
     return
 
 
-def psychrochart(data, zone):
+def psychrochart(data, zone, weather):
     '''
     Prints the standard Ashrae psychrometric chart with data from a zone.
     '''
@@ -514,9 +514,26 @@ def psychrochart(data, zone):
                 'style': {
                     'color': [0.592, 0.745, 0.051, 0.7],
                     'marker': 'o',
-                    'markersize': 5
+                    'markersize': 8
                 },
                 'xy': (row['TAIR_' + zone], row['RELHUM_' + zone])
+            }
+        })
+
+    chart.plot_points_dbt_rh(points)
+
+    # add labelled points from outdoor conditions
+    points = dict()
+    for index, row in weather[['temp_air', 'relative_humidity']].iterrows():
+        key = 'interior_{}'.format(index)
+        points.update({
+            key: {
+                'style': {
+                    'color': [0.992, 0.145, 0.051, 0.7],
+                    'marker': 'x',
+                    'markersize': 8
+                },
+                'xy': (row['temp_air'], row['relative_humidity'])
             }
         })
 
