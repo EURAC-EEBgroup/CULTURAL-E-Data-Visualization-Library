@@ -462,6 +462,64 @@ def monthly_consumption(energy):
     plt.show()
 
 
+def self_production_consumption(energy):
+    '''
+    Prints the self-consumpion/self-production.
+    '''
+    _fig, axs = plt.subplots(1, 1, figsize=(16, 9), tight_layout=True)
+
+    # the width of our bars
+    bar_width = 0.3
+
+    # add x, y gridlines
+    axs.grid(b=True, color='grey', linestyle='-.', linewidth=0.5, alpha=0.6)
+
+    months = [
+        'January', 'February', 'March', 'April', 'May', 'June', 'July',
+        'August', 'September', 'October', 'November', 'December'
+    ]
+
+    # map hours to their month
+    def month_from_hr(hour):
+        return min(int(hour) // HOURS_IN_A_MONTH, len(months) - 1)
+
+    energy['MONTH'] = energy['TIME'].apply(month_from_hr)
+
+    # aggregate monthly consumptions
+    data = energy.groupby('MONTH').sum()
+
+    f_xpos = [i for i, _ in enumerate(months)]
+    s_xpos = [val + bar_width for val in f_xpos]
+    t_xpos = [val + bar_width for val in s_xpos]
+
+    # we want to use months as our x-axis ticks, instead of numbers, 
+    # and we want it centered between the two bars.
+    tick_pos = [val + bar_width for val in f_xpos]
+    plt.xticks(tick_pos, months)
+
+    # 
+    plt.bar(f_xpos, [max(0, i) / JOULE_TO_KW_FACTOR for i in data['Consumption_power']],
+            label='Consumption', width=bar_width)
+    plt.bar(s_xpos, [max(0, i) / JOULE_TO_KW_FACTOR for i in data['Production_power']],
+            label='Production', width=bar_width)
+    plt.bar(t_xpos, [max(0, i) / JOULE_TO_KW_FACTOR for i in data['Selfconsumption_power']],
+            label='Self-Consumption', width=bar_width)
+
+    # remove spines
+    axs.spines['right'].set_visible(False)
+    axs.spines['left'].set_visible(False)
+    axs.spines['top'].set_visible(False)
+    axs.spines['bottom'].set_visible(False)
+
+    # style graph
+    axs.set_title('Self-Production/Self-Consumption', fontsize=TITLE_FONTSIZE)
+    axs.set_ylabel('Energy Demand [kWh]', fontsize=LABELS_FONTSIZE)
+    axs.tick_params(labelsize=TICKS_FONTSIZE)
+    axs.legend(fontsize=LEGEND_FONTSIZE)
+
+    plt.show()
+
+
 def adaptive_thermal_comfort():
     # TODO
     return
@@ -709,7 +767,7 @@ def airt_heatmap(data, zone):
     df = df.pivot(index='HOUR', columns='DAY', values='TAIR_' + zone)
 
     sns.heatmap(df, cmap='plasma')
-    
+
     plt.show()
 
 
