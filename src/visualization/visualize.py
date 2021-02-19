@@ -492,18 +492,26 @@ def self_production_consumption(energy):
     s_xpos = [val + bar_width for val in f_xpos]
     t_xpos = [val + bar_width for val in s_xpos]
 
-    # we want to use months as our x-axis ticks, instead of numbers, 
+    # we want to use months as our x-axis ticks, instead of numbers,
     # and we want it centered between the two bars.
     tick_pos = [val + bar_width for val in f_xpos]
     plt.xticks(tick_pos, months)
 
-    # 
-    plt.bar(f_xpos, [max(0, i) / JOULE_TO_KW_FACTOR for i in data['Consumption_power']],
-            label='Consumption', width=bar_width)
-    plt.bar(s_xpos, [max(0, i) / JOULE_TO_KW_FACTOR for i in data['Production_power']],
-            label='Production', width=bar_width)
-    plt.bar(t_xpos, [max(0, i) / JOULE_TO_KW_FACTOR for i in data['Selfconsumption_power']],
-            label='Self-Consumption', width=bar_width)
+    #
+    plt.bar(
+        f_xpos,
+        [max(0, i) / JOULE_TO_KW_FACTOR for i in data['Consumption_power']],
+        label='Consumption',
+        width=bar_width)
+    plt.bar(s_xpos,
+            [max(0, i) / JOULE_TO_KW_FACTOR for i in data['Production_power']],
+            label='Production',
+            width=bar_width)
+    plt.bar(t_xpos, [
+        max(0, i) / JOULE_TO_KW_FACTOR for i in data['Selfconsumption_power']
+    ],
+            label='Self-Consumption',
+            width=bar_width)
 
     # remove spines
     axs.spines['right'].set_visible(False)
@@ -520,9 +528,49 @@ def self_production_consumption(energy):
     plt.show()
 
 
+def running_mean_outdoor_temperature(temp_array, alpha=0.8):
+    """ Estimates the running mean temperature
+
+    Parameters
+    ----------
+    temp_array: list
+        array containing the mean daily temperature in descending order (i.e. from
+        newest/yesterday to oldest) :math:`[\Theta_{day-1}, \Theta_{day-2}, \dots ,
+        \Theta_{day-n}]`.
+        Where :math:`\Theta_{day-1}` is yesterday's daily mean temperature. The EN
+        16798-1 2019 [3]_ states that n should be equal to 7
+    alpha : float
+        constant between 0 and 1. The EN 16798-1 2019 [3]_ recommends a value of 0.8,
+        while the ASHRAE 55 2017 recommends to choose values between 0.9 and 0.6,
+        corresponding to a slow- and fast- response running mean, respectively.
+        Adaptive comfort theory suggests that a slow-response running mean (alpha =
+        0.9) could be more appropriate for climates in which synoptic-scale (day-to-
+        day) temperature dynamics are relatively minor, such as the humid tropics.
+    units: str default="SI"
+        select the SI (International System of Units) or the IP (Imperial Units) system.
+
+    Returns
+    -------
+    t_rm  : float
+        running mean outdoor temperature
+    """
+    coeff = [alpha**ix for ix, x in enumerate(temp_array)]
+    t_rm = sum([a * b for a, b in zip(coeff, temp_array)]) / sum(coeff)
+
+    return round(t_rm, 1)
+
+
 def adaptive_thermal_comfort():
-    # TODO
-    return
+    x = np.linspace(18, 30, 12)
+    print(x)
+
+    for c, l in [(-3, 'Cat III'), (-4, 'Cat II'), (-5, 'Cat I'), (2, 'Cat I'),
+                 (3, 'Cat II'), (4, 'Cat III')]:
+        y = 0.33 * x + 18.8 + c
+        plt.plot(x, y, label=l)
+
+    plt.legend()
+    plt.show()
 
 
 def psychrochart(data, zone, weather):
