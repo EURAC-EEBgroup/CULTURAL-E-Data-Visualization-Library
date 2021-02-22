@@ -58,7 +58,7 @@ def air_temperature(weather):
     ax1.tick_params(labelsize=TICKS_FONTSIZE)
     ax2.tick_params(labelsize=TICKS_FONTSIZE)
     plt.xticks(np.arange(-20, 41, 2))
-    ax1.set_xlabel("Dry Bulb Temperature, T_air [°C]",
+    ax1.set_xlabel("Dry Bulb Temperature, T_out [°C]",
                    fontsize=LABELS_FONTSIZE)
     ax1.set_ylabel("Hours [hr]", fontsize=LABELS_FONTSIZE)
     ax2.set_ylabel("Cumulative frequency [%]", fontsize=LABELS_FONTSIZE)
