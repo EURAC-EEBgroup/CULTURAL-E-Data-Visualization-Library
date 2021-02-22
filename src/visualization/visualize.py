@@ -584,10 +584,10 @@ def psychrochart(data, zone, weather):
         "zones": [{
             "zone_type": "dbt-rh",
             "style": {
-                "edgecolor": [1.0, 0.749, 0.0, 0.8],
-                "facecolor": [1.0, 0.749, 0.0, 0.2],
-                "linewidth": 2,
-                "linestyle": "--"
+                "edgecolor": [1.0, 0.749, 0.0],
+                "facecolor": [1.0, 0.749, 0.0, 0.0],
+                "linewidth": 5,
+                "linestyle": "-"
             },
             "points_x": [23, 28],
             "points_y": [40, 60],
@@ -596,13 +596,46 @@ def psychrochart(data, zone, weather):
             "zone_type": "dbt-rh",
             "style": {
                 "edgecolor": [0.498, 0.624, 0.8],
-                "facecolor": [0.498, 0.624, 1.0, 0.2],
-                "linewidth": 2,
-                "linestyle": "--"
+                "facecolor": [1.0, 1.0, 1.0, 0.0],
+                "linewidth": 5,
+                "linestyle": "-"
             },
             "points_x": [18, 23],
             "points_y": [35, 55],
             "label": "Winter"
+        }, {
+            "zone_type": "dbt-rh",
+            "style": {
+                "edgecolor": [0.1, 0.1, 1.0],
+                "facecolor": [0.1, 0.1, 1.0, 0.2],
+                "linewidth": 2,
+                "linestyle": "--"
+            },
+            "points_x": [0, 18],
+            "points_y": [0, 100],
+            "label": "Heating Zone"
+        }, {
+            "zone_type": "dbt-rh",
+            "style": {
+                "edgecolor": [1.00, 0.90, 0.40],
+                "facecolor": [1.00, 0.90, 0.40, 0.2],
+                "linewidth": 2,
+                "linestyle": "--"
+            },
+            "points_x": [18, 50],
+            "points_y": [0, 50],
+            "label": "Cooling Humidifying Zone"
+        }, {
+            "zone_type": "dbt-rh",
+            "style": {
+                "edgecolor": [1.00, 0.16, 0.00],
+                "facecolor": [1.00, 0.16, 0.00, 0.2],
+                "linewidth": 2,
+                "linestyle": "--"
+            },
+            "points_x": [18, 50],
+            "points_y": [50, 100],
+            "label": "Cooling Dehumidifying Zone"
         }]
     }
 
@@ -618,7 +651,7 @@ def psychrochart(data, zone, weather):
         points.update({
             key: {
                 'style': {
-                    'color': [0.592, 0.745, 0.051, 0.7],
+                    'color': [0.592, 0.745, 0.051, 1.0],
                     'marker': 'o',
                     'markersize': 8
                 },
@@ -635,7 +668,7 @@ def psychrochart(data, zone, weather):
         points.update({
             key: {
                 'style': {
-                    'color': [0.992, 0.145, 0.051, 0.7],
+                    'color': [0.992, 0.145, 0.051, 1.0],
                     'marker': 'x',
                     'markersize': 8
                 },
