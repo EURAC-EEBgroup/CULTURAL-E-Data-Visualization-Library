@@ -490,7 +490,6 @@ def self_production_consumption(energy):
 
     f_xpos = [i for i, _ in enumerate(months)]
     s_xpos = [val + bar_width for val in f_xpos]
-    t_xpos = [val + bar_width for val in s_xpos]
 
     # we want to use months as our x-axis ticks, instead of numbers,
     # and we want it centered between the two bars.
@@ -498,17 +497,15 @@ def self_production_consumption(energy):
     plt.xticks(tick_pos, months)
 
     #
-    plt.bar(
-        f_xpos,
-        [max(0, i) / JOULE_TO_KW_FACTOR for i in data['Consumption_power']],
-        label='Consumption',
-        width=bar_width)
-    plt.bar(s_xpos,
-            [max(0, i) / JOULE_TO_KW_FACTOR for i in data['Production_power']],
-            label='Production',
+    plt.bar(f_xpos, [
+        100 * i / j for i, j in zip(data['Selfconsumption_power'],
+                                    data['Consumption_power'])
+    ],
+            label='Self-Sufficiency',
             width=bar_width)
-    plt.bar(t_xpos, [
-        max(0, i) / JOULE_TO_KW_FACTOR for i in data['Selfconsumption_power']
+    plt.bar(s_xpos, [
+        100 * i / j for i, j in zip(data['Selfconsumption_power'],
+                                    data['Production_power'])
     ],
             label='Self-Consumption',
             width=bar_width)
@@ -520,8 +517,8 @@ def self_production_consumption(energy):
     axs.spines['bottom'].set_visible(False)
 
     # style graph
-    axs.set_title('Self-Production/Self-Consumption', fontsize=TITLE_FONTSIZE)
-    axs.set_ylabel('Energy Demand [kWh]', fontsize=LABELS_FONTSIZE)
+    axs.set_title('Self-Sufficiency/Self-Consumption', fontsize=TITLE_FONTSIZE)
+    axs.set_ylabel('Percentage [%]', fontsize=LABELS_FONTSIZE)
     axs.tick_params(labelsize=TICKS_FONTSIZE)
     axs.legend(fontsize=LEGEND_FONTSIZE)
 
