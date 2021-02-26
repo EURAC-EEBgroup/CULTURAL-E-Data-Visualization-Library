@@ -429,9 +429,7 @@ def monthly_consumption(energy):
     data = energy.groupby('MONTH').sum()
 
     # fields accounting for the consumtions
-    fields = [
-        'WEL_PDC_HEAT', 'WEL_PDC_COOL', 'WEL_VMC', 'IG_APL_TOT', 'IG_LGT_TOT'
-    ]
+    fields = ['QHEAT_TOT', 'QCOOL_TOT', 'QVMC_TOT', 'QAPL_TOT', 'QLGT_TOT']
 
     # months of the year
     x = labels
@@ -497,16 +495,12 @@ def self_production_consumption(energy):
     plt.xticks(tick_pos, months)
 
     #
-    plt.bar(f_xpos, [
-        100 * i / j for i, j in zip(data['Selfconsumption_power'],
-                                    data['Consumption_power'])
-    ],
+    plt.bar(f_xpos,
+            [100 * i / j for i, j in zip(data['PV_selfC'], data['QEL_TOT'])],
             label='Self-Sufficiency',
             width=bar_width)
-    plt.bar(s_xpos, [
-        100 * i / j for i, j in zip(data['Selfconsumption_power'],
-                                    data['Production_power'])
-    ],
+    plt.bar(s_xpos,
+            [100 * i / j for i, j in zip(data['PV_selfC'], data['PV_p'])],
             label='Self-Consumption',
             width=bar_width)
 
@@ -702,8 +696,8 @@ def iaq_co2(data, living_rooms, bedrooms):
     # zones used during day have different categories with respect to nightly zones
     # start with day zones
     for zone in living_rooms:
-        co2 = 'CO2_CON_' + zone
-        occupancy = 'SCH_PER_' + zone
+        co2 = 'CO2_' + zone
+        occupancy = 'OCC_' + zone
 
         co_2 = [
             data.query('({} <= {}) and ({} > 0)'.format(
@@ -731,8 +725,8 @@ def iaq_co2(data, living_rooms, bedrooms):
 
     # follow with night zones
     for zone in bedrooms:
-        co2 = 'CO2_CON_' + zone
-        occupancy = 'SCH_PER_' + zone
+        co2 = 'CO2_' + zone
+        occupancy = 'OCC_' + zone
 
         co_2 = [
             data.query('({} <= {}) and ({} > 0)'.format(
@@ -849,7 +843,7 @@ def airt_heatmap(data, zone):
     plt.show()
 
 
-def shd_heatmap(data):
+def shd_heatmap(data, zone):
     '''
     Prints a heatmap with the value for the shading at every hour of the day, for every day
     of the year.
@@ -863,16 +857,16 @@ def shd_heatmap(data):
         return int(hour) // 24
 
     # shape data
-    df = data[['TIME', 'SHD_W1']]
+    df = data[['TIME', 'SHD_' + zone]]
     df['DAY'] = df['TIME'].apply(day)
     df['HOUR'] = df['TIME'].apply(hr_of_day)
-    df = df.pivot(index='HOUR', columns='DAY', values='SHD_W1')
+    df = df.pivot(index='HOUR', columns='DAY', values='SHD_' + zone)
     sns.heatmap(df, cmap='plasma')
 
     plt.show()
 
 
-def win_heatmap(data):
+def win_heatmap(data, zone):
     '''
     Prints a heatmap with the value for the windows opening at every hour of the day, for every day
     of the year.
@@ -886,10 +880,10 @@ def win_heatmap(data):
         return int(hour) // 24
 
     # shape data
-    df = data[['TIME', 'WIN_LR']]
+    df = data[['TIME', 'WIN_OF_' + zone]]
     df['DAY'] = df['TIME'].apply(day)
     df['HOUR'] = df['TIME'].apply(hr_of_day)
-    df = df.pivot(index='HOUR', columns='DAY', values='WIN_LR')
+    df = df.pivot(index='HOUR', columns='DAY', values='WIN_OF_' + zone)
     sns.heatmap(df, cmap='plasma')
 
     plt.show()

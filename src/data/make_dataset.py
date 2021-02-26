@@ -100,7 +100,7 @@ def clean_cultural_e(input_filepath, output_filepath):
     The .out file is a sort of csv that uses whitespaces as separators, we convert it to a
     .csv in a more classical dialect.
     '''
-    src = input_filepath + '/CULTURAL-E_TSTEP.out'
+    src = input_filepath + '/Cultural-e_output.out'
     dst = output_filepath + '/cultural-e.csv'
 
     bal = open(src, 'r')
