@@ -840,6 +840,9 @@ def airt_heatmap(data, zone):
 
     sns.heatmap(df, cmap='plasma')
 
+    # title
+    plt.title("Hourly mapping of internal temperatures  - {}".format(zone), fontsize=TITLE_FONTSIZE)
+
     plt.show()
 
 
@@ -856,6 +859,7 @@ def shd_heatmap(data, zone):
     def day(hour):
         return int(hour) // 24
 
+
     # shape data
     df = data[['TIME', 'SHD_' + zone]]
     df['DAY'] = df['TIME'].apply(day)
@@ -863,6 +867,9 @@ def shd_heatmap(data, zone):
     df = df.pivot(index='HOUR', columns='DAY', values='SHD_' + zone)
     sns.heatmap(df, cmap='plasma')
 
+    # title
+    plt.title("Frequency of use of the shading system - {}".format(zone), fontsize=TITLE_FONTSIZE)
+    
     plt.show()
 
 
@@ -885,5 +892,8 @@ def win_heatmap(data, zone):
     df['HOUR'] = df['TIME'].apply(hr_of_day)
     df = df.pivot(index='HOUR', columns='DAY', values='WIN_OF_' + zone)
     sns.heatmap(df, cmap='plasma')
+
+    # title
+    plt.title("Window opening frequency - {}".format(zone), fontsize=TITLE_FONTSIZE)
 
     plt.show()
