@@ -143,6 +143,31 @@ def fix_year_in_cultural_e(input_filepath, output_filepath):
     df.to_csv(dst, index=False)
 
 
+def clean_cultural_e_input(input_filepath, output_filepath):
+    '''
+    The .out file is a sort of csv that uses whitespaces as separators, we convert it to a
+    .csv in a more classical dialect.
+    '''
+    src = input_filepath + '/Cultural-e_input.out'
+    dst = output_filepath + '/cultural-e-input.csv'
+
+    bal = open(src, 'r')
+    csv = open(dst, 'w')
+
+    line = bal.readline()
+    # remove forbidden characters from title row
+    o = re.sub('[^ A-Za-z_1-9\n]*', '', line)
+    # format row as csv
+    o = re.sub(' +', ',', o)
+
+    csv.write(o[1:-2] + '\n')
+
+    # format remaining rows
+    for line in bal.readlines():
+        o = re.sub('[ \t]+', ',', line)
+        csv.write(o[1:-2] + '\n')
+
+
 def clean_meteo(input_filepath, output_filepath):
     '''
     The weather file is already in a proper format, we just rename and copy it to the processed
@@ -170,6 +195,7 @@ def main(input_filepath, output_filepath):
     fix_year_in_energy_zones(input_filepath, output_filepath)
     clean_cultural_e(input_filepath, output_filepath)
     fix_year_in_cultural_e(input_filepath, output_filepath)
+    clean_cultural_e_input(input_filepath, output_filepath)
     clean_meteo(input_filepath, output_filepath)
     logger.info('final data set ready')
 

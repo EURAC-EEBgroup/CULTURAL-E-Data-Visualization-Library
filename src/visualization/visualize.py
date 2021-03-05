@@ -52,7 +52,7 @@ def air_temperature(weather):
              alpha=0.6)
 
     # title
-    plt.title("Air Temperature", fontsize=TITLE_FONTSIZE)
+    plt.title("Dry Bulb temperature distribution [C°] ", fontsize=TITLE_FONTSIZE)
 
     # style axes
     ax1.tick_params(labelsize=TICKS_FONTSIZE)
@@ -110,7 +110,7 @@ def relative_humidity(weather):
              alpha=0.6)
 
     # title
-    plt.title("Relative Humidity", fontsize=TITLE_FONTSIZE)
+    plt.title("Relative humidity distribution", fontsize=TITLE_FONTSIZE)
 
     # style axes
     ax1.tick_params(labelsize=TICKS_FONTSIZE)
@@ -166,7 +166,7 @@ def horizontal_irradiance(weather):
              alpha=0.6)
 
     # title
-    plt.title("Global Horizontal Irradiance", fontsize=TITLE_FONTSIZE)
+    plt.title("Global horizontal radiation distribution", fontsize=TITLE_FONTSIZE)
 
     # style axes
     ax1.tick_params(labelsize=TICKS_FONTSIZE)
