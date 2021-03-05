@@ -18,13 +18,13 @@ pip install -r requirements.txt
 
 Consider using a ```virtualenv``` before doing this (strongly suggested).
 
-Now you are ready to go. The ```/data``` folder contains some example data that you can cleanup with:
+Now you are ready to go. The /data/raw folder contains some example data from a simulation respecting the naming conventions. This is where you will have to move your simulation’s output files. Once you added your files to the folder head to the /src/data/make_dataset.py script and adapt it to the names of the new files if different. You can clean-up the data, and have it ready for the analysis, by running the following command in a terminal:
 
 ```bash
 make data
 ```
 
-and then head to the ```/notebooks``` folder and open the file ```1.0-report.ipynb``` in your [Jupiter Notebook](https://jupyter.org/) editor. Running this notebook will give a standardized set of graphs describing the main results of the simulation in the data folder.
+Finally, head to the /notebooks folder and open the file 1.0-report.ipynb in your Jupiter Notebook editor. Running this notebook will output a standardized set of graphs describing the main results of the simulation in the data folder.
 Feel free to modify the notebook at your convenience in order to tailor the analysis to your needs.
 
 ## Project Organization
