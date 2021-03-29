@@ -8,7 +8,7 @@ For more information, please refer to the homepage of the project on which this 
 
 First, you need to install Python on your machine (`v3.5` or above). Python comes preinstalled on many operating system, but you can find more information [here](https://wiki.python.org/moin/BeginnersGuide/Download).
 
-Once you get Python running on your machine, you should be ready to use also its package manager `pip`. So let's try to install our project's dependecies.
+Once you get Python running on your machine, you should be ready to use also its package manager `pip` (you can find more information [here](https://pip.pypa.io/en/stable/installing/)). So let's try to install our project's dependecies.
 
 Open a terminal in the top folder of the project (if you need help take a look [here](https://www.stugon.com/open-terminal-in-current-folder-location-mac/)), copy the following line, then press enter.
 
@@ -18,7 +18,7 @@ pip install -r requirements.txt
 
 If you are familiar with Python, I strongly suggest yuo use a ```virtualenv``` when doing this.
 
-The last piece of software that you need i Jupyter. You can find detailed instructions [here](https://jupyter.org/install), but it is very similar to the previous step.
+The last piece of software that you need is Jupyter. You can find detailed instructions [here](https://jupyter.org/install), but it is very similar to the previous step.
 Open a terminal and run the following command:
 
 ```bash

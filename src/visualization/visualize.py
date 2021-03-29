@@ -833,7 +833,7 @@ def airt_heatmap(data, zone):
         return int(hour) // 24
 
     # shape data
-    df = data[['TIME', 'TAIR_' + zone]]
+    df = data[['TIME', 'TAIR_' + zone]].copy()
     df['DAY'] = df['TIME'].apply(day)
     df['HOUR'] = df['TIME'].apply(hr_of_day)
     df = df.pivot(index='HOUR', columns='DAY', values='TAIR_' + zone)
@@ -861,7 +861,7 @@ def shd_heatmap(data, zone):
 
 
     # shape data
-    df = data[['TIME', 'SHD_' + zone]]
+    df = data[['TIME', 'SHD_' + zone]].copy()
     df['DAY'] = df['TIME'].apply(day)
     df['HOUR'] = df['TIME'].apply(hr_of_day)
     df = df.pivot(index='HOUR', columns='DAY', values='SHD_' + zone)
@@ -887,7 +887,7 @@ def win_heatmap(data, zone):
         return int(hour) // 24
 
     # shape data
-    df = data[['TIME', 'WIN_OF_' + zone]]
+    df = data[['TIME', 'WIN_OF_' + zone]].copy()
     df['DAY'] = df['TIME'].apply(day)
     df['HOUR'] = df['TIME'].apply(hr_of_day)
     df = df.pivot(index='HOUR', columns='DAY', values='WIN_OF_' + zone)
