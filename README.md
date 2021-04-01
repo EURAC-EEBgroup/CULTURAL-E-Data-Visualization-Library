@@ -1,4 +1,4 @@
-# Cultural-e Data Visualization Library
+# CULTURAL-E Data Visualization Library
 
 The present project makes use of a standard structure for data science projects, that aims at correctness and reproducibility. The results are multiple and comprise: an installable Python library, Jupiter notebooks and HTML reports, data clean-up scripts for the standard input data, and an effective development environment.
 
