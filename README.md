@@ -1,4 +1,4 @@
-# Cultural-e Visualization Library - simviz
+# Cultural-e Data Visualization Library
 
 The present project makes use of a standard structure for data science projects, that aims at correctness and reproducibility. The results are multiple and comprise: an installable Python library, Jupiter notebooks and HTML reports, data clean-up scripts for the standard input data, and an effective development environment.
 
@@ -7,6 +7,8 @@ For more information, please refer to the homepage of the project on which this 
 ## Usage
 
 First, you need to install Python on your machine (`v3.5` or above). Python comes preinstalled on many operating system, but you can find more information [here](https://wiki.python.org/moin/BeginnersGuide/Download).
+
+Notice that the following instructions may vary among operating systems, and an easier solution for some of them might be using [Anaconda](https://www.anaconda.com/).
 
 Once you get Python running on your machine, you should be ready to use also its package manager `pip` (you can find more information [here](https://pip.pypa.io/en/stable/installing/)). So let's try to install our project's dependecies.
 
@@ -45,6 +47,17 @@ make data
 
 Finally, head to the /notebooks folder and open the file 1.0-report.ipynb in your Jupiter Notebook editor. Running this notebook will output a standardized set of graphs describing the main results of the simulation in the data folder.
 Feel free to modify the notebook at your convenience in order to tailor the analysis to your needs.
+
+## Acknowledgments
+
+**Acknowledgement of EU funding**: This project has received funding from the European Union’s Horizon 2020 research and innovation program under grant agreement n° 870072.
+
+**Disclaimer excluding Commission responsibility**: The content of this repository does not reflect the official opinion of the European Union. Responsibility for the information and views expressed therein lies entirely with the author(s).
+
+## License
+
+Licensed under MIT license.
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in this crate by you, shall be licensed as above, without any additional terms or conditions.
 
 ## Project Organization
 
