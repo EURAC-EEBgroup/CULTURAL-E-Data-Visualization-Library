@@ -16,6 +16,12 @@ LEGEND_FONTSIZE = 15
 JOULE_TO_WATT_FACTOR = 3.6
 JOULE_TO_KW_FACTOR = JOULE_TO_WATT_FACTOR * 1000
 HOURS_IN_A_MONTH = 730
+COLOR_PALETTE = [
+    '#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4',
+    '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff',
+    '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1',
+    '#000075', '#808080', '#ffffff', '#000000'
+]
 
 
 def air_temperature(weather):
@@ -52,7 +58,8 @@ def air_temperature(weather):
              alpha=0.6)
 
     # title
-    plt.title("Dry Bulb temperature distribution [C°] ", fontsize=TITLE_FONTSIZE)
+    plt.title("Dry Bulb temperature distribution [C°] ",
+              fontsize=TITLE_FONTSIZE)
 
     # style axes
     ax1.tick_params(labelsize=TICKS_FONTSIZE)
@@ -166,7 +173,8 @@ def horizontal_irradiance(weather):
              alpha=0.6)
 
     # title
-    plt.title("Global horizontal radiation distribution", fontsize=TITLE_FONTSIZE)
+    plt.title("Global horizontal radiation distribution",
+              fontsize=TITLE_FONTSIZE)
 
     # style axes
     ax1.tick_params(labelsize=TICKS_FONTSIZE)
@@ -294,10 +302,11 @@ def energy_balance(balance):
 
     # first plot the positive contributions
     bottom = len(balance['Zonenr']) * [0]
-    for _idx, name in enumerate(fields):
+    for n, name in enumerate(fields):
         plt.bar(x, [max(0, i) / JOULE_TO_KW_FACTOR for i in balance[name]],
                 bottom=bottom,
-                label=name)
+                label=name,
+                color=COLOR_PALETTE[n])
         bottom = [
             max(0, i) / JOULE_TO_KW_FACTOR + j
             for i, j in zip(balance[name], bottom)
@@ -305,14 +314,15 @@ def energy_balance(balance):
 
     # now plot the negative contributions
     bottom = len(balance['Zonenr']) * [0]
-    for _idx, name in enumerate(fields):
+    for n, name in enumerate(fields):
         bottom = [
             min(0, i) / JOULE_TO_KW_FACTOR + j
             for i, j in zip(balance[name], bottom)
         ]
         plt.bar(x, [-min(0, i) / JOULE_TO_KW_FACTOR for i in balance[name]],
                 bottom=bottom,
-                label=name)
+                label=name,
+                color=COLOR_PALETTE[n])
 
     # remove spines
     axs.spines['right'].set_visible(False)
@@ -325,7 +335,7 @@ def energy_balance(balance):
     axs.set_ylabel('Energy Demand [kWh]', fontsize=LABELS_FONTSIZE)
     axs.set_xlabel("Zone", fontsize=LABELS_FONTSIZE)
     axs.tick_params(labelsize=TICKS_FONTSIZE)
-    axs.legend(fontsize=LEGEND_FONTSIZE)
+    axs.legend(labels=fields, fontsize=LEGEND_FONTSIZE)
 
     plt.show()
 
@@ -355,24 +365,25 @@ def zone_energy_balance(energy, zone=''):
 
     data = energy.groupby('MONTH').sum()
 
-    # fields accounting for the energy balance
-    fields = [
-        zone + prop for prop in [
-            '_B4_QBAL', '_B4_DQAIRdT', '_B4_QHEAT', '_B4_QCOOL', '_B4_QINF',
-            '_B4_QVENT', 'B4_QCOUP', '_B4_QTRANS', '_B4_QGINT', '_B4_QWGAIN',
-            '_B4_QSOL', '_B4_QSOLAIR'
-        ]
+    props = [
+        '_B4_QBAL', '_B4_DQAIRdT', '_B4_QHEAT', '_B4_QCOOL', '_B4_QINF',
+        '_B4_QVENT', 'B4_QCOUP', '_B4_QTRANS', '_B4_QGINT', '_B4_QWGAIN',
+        '_B4_QSOL', '_B4_QSOLAIR'
     ]
+
+    # fields accounting for the energy balance
+    fields = [zone + prop for prop in props]
 
     # the months of the year
     x = labels
 
     # first plot the positive contributions
     bottom = len(labels) * [0]
-    for _idx, name in enumerate(fields):
+    for n, name in enumerate(fields):
         plt.bar(x, [max(0, i) / JOULE_TO_KW_FACTOR for i in data[name]],
                 bottom=bottom,
-                label=name)
+                label=name,
+                color=COLOR_PALETTE[n])
         bottom = [
             max(0, i) / JOULE_TO_KW_FACTOR + j
             for i, j in zip(data[name], bottom)
@@ -380,14 +391,15 @@ def zone_energy_balance(energy, zone=''):
 
     # now plot the negative contributions
     bottom = len(labels) * [0]
-    for _idx, name in enumerate(fields):
+    for n, name in enumerate(fields):
         bottom = [
             min(0, i) / JOULE_TO_KW_FACTOR + j
             for i, j in zip(data[name], bottom)
         ]
         plt.bar(x, [-min(0, i) / JOULE_TO_KW_FACTOR for i in data[name]],
                 bottom=bottom,
-                label=name)
+                label=name,
+                color=COLOR_PALETTE[n])
 
     # remove spines
     axs.spines['right'].set_visible(False)
@@ -400,7 +412,7 @@ def zone_energy_balance(energy, zone=''):
                   fontsize=TITLE_FONTSIZE)
     axs.set_ylabel('Energy Demand [kWh]', fontsize=LABELS_FONTSIZE)
     axs.tick_params(labelsize=TICKS_FONTSIZE)
-    axs.legend(fontsize=LEGEND_FONTSIZE)
+    axs.legend(labels=fields, fontsize=LEGEND_FONTSIZE)
 
     plt.show()
 
@@ -841,7 +853,8 @@ def airt_heatmap(data, zone):
     sns.heatmap(df, cmap='plasma')
 
     # title
-    plt.title("Hourly mapping of internal temperatures  - {}".format(zone), fontsize=TITLE_FONTSIZE)
+    plt.title("Hourly mapping of internal temperatures  - {}".format(zone),
+              fontsize=TITLE_FONTSIZE)
 
     plt.show()
 
@@ -859,7 +872,6 @@ def shd_heatmap(data, zone):
     def day(hour):
         return int(hour) // 24
 
-
     # shape data
     df = data[['TIME', 'SHD_' + zone]].copy()
     df['DAY'] = df['TIME'].apply(day)
@@ -868,8 +880,9 @@ def shd_heatmap(data, zone):
     sns.heatmap(df, cmap='plasma')
 
     # title
-    plt.title("Frequency of use of the shading system - {}".format(zone), fontsize=TITLE_FONTSIZE)
-    
+    plt.title("Frequency of use of the shading system - {}".format(zone),
+              fontsize=TITLE_FONTSIZE)
+
     plt.show()
 
 
@@ -894,6 +907,7 @@ def win_heatmap(data, zone):
     sns.heatmap(df, cmap='plasma')
 
     # title
-    plt.title("Window opening frequency - {}".format(zone), fontsize=TITLE_FONTSIZE)
+    plt.title("Window opening frequency - {}".format(zone),
+              fontsize=TITLE_FONTSIZE)
 
     plt.show()
